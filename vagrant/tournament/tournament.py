@@ -13,15 +13,60 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    # Open the database connection.
+    conn = connect()
+    
+    # Obtain a cursor.
+    c = conn.cursor()
 
+    # Execute the SQL query to clear the matches table.
+    c.execute("DELETE FROM matches")
+
+    # Commit.
+    conn.commit()
+
+    # Close the database connection.
+    conn.close()
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    # Open the database connection.
+    conn = connect()
+    
+    # Obtain a cursor.
+    c = conn.cursor()
+
+    # Execute the SQL query to clear the players table.
+    c.execute("DELETE FROM players")
+
+    # Commit.
+    conn.commit()
+
+    # Close the database connection.
+    conn.close()
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    # Open the database connection.
+    conn = connect()
+    
+    # Obtain a cursor.
+    c = conn.cursor()
 
+    # Execute the SQL query to count the number of rows in the players table.
+    c.execute("SELECT count(*) FROM players")
+
+    # The count will be the first column of the first and only row.
+    result = c.fetchall()[0][0]
+
+    # Commit.
+    conn.commit()
+
+    # Close the database connection.
+    conn.close()
+
+    return result
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -32,6 +77,20 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    # Open the database connection.
+    conn = connect()
+    
+    # Obtain a cursor.
+    c = conn.cursor()
+
+    # Execute the SQL query to insert the player name into the players table.
+    c.execute("INSERT INTO players VALUES (%s)", (name,))
+
+    # Commit.
+    conn.commit()
+
+    # Close the database connection.
+    conn.close()
 
 
 def playerStandings():
