@@ -12,7 +12,31 @@ DROP DATABASE IF EXISTS tournament;
 CREATE DATABASE tournament;
 -- Connect to the tournament database
 \c tournament
--- Create the Players table.
-CREATE TABLE players (name TEXT, id SERIAL PRIMARY KEY);
--- Create the Matches table.
-CREATE TABLE matches (player1_id INTEGER REFERENCES players (id), player2_id INTEGER REFERENCES players (id), id SERIAL PRIMARY KEY);
+-- Create the players table.
+CREATE TABLE players (
+	name TEXT, 
+	id SERIAL PRIMARY KEY
+	);
+
+-- Create the matches table. Each match references two players from the players table.
+-- player1_score and player2_score columns hold the score for player 1 and player 2, respectively.  
+-- A win earns a player 3 points, a tie earns each player 1 point.  A loss results in a score of 0 points.
+CREATE TABLE matches (	
+	player_id INTEGER REFERENCES players (id), 
+	opponent_id INTEGER REFERENCES players (id),
+	player_score INTEGER,
+	CONSTRAINT match_id PRIMARY KEY (player_id, opponent_id)		
+	);
+
+-- Create a view to hold the standings.
+-- CREATE VIEW wins_view AS SELECT players.name, players.id, count(matches.winner_id) AS wins FROM players LEFT JOIN matches on players.id = matches.winner_id GROUP BY players.id ORDER BY wins DESC;
+
+-- CREATE VIEW losses_view AS SELECT players.name, players.id, count(matches.loser_id) AS losses FROM players LEFT JOIN matches on players.id = matches.loser_id GROUP BY players.id ORDER BY losses DESC;
+
+-- SELECT players.id, count(matches.player1_id) AS num FROM players LEFT JOIN matches ON players.id = matches.player1_id OR players.id = matches.player2_id GROUP BY players.id ORDER BY num;
+-- SELECT players.id, count(matches.player1_id) AS num FROM players LEFT JOIN matches ON players.id = matches.player1_id OR players.id = matches.player2_id GROUP BY players.id ORDER BY num;
+
+CREATE VIEW match_count_view AS SELECT players.id, count(matches.player_id) AS matches FROM players LEFT JOIN matches on players.id = matches.player_id GROUP BY players.id ORDER BY matches;
+CREATE VIEW match_wins_view AS SELECT players.id, count(matches.player_id) AS wins FROM players LEFT JOIN matches ON players.id = matches.player_id AND matches.player_score = 3 GROUP BY players.id ORDER BY wins DESC;
+CREATE VIEW player_standings_view AS SELECT players.id, players.name, match_count_view.matches, match_wins_view.wins FROM players, match_count_view, match_wins_view WHERE players.id = match_count_view.id AND players.id = match_wins_view.id ORDER BY match_wins_view.wins DESC;
+
