@@ -107,6 +107,26 @@ def playerStandings():
         matches: the number of matches the player has played
     """
 
+    # Open the database connection.
+    conn = connect()
+    
+    # Obtain a cursor.
+    c = conn.cursor()
+
+    # Execute the SQL query to count the number of rows in the players table.
+    c.execute("SELECT * FROM player_standings_view")
+
+    # The count will be the first column of the first and only row.
+    result = c.fetchall()
+
+    # Commit.
+    conn.commit()
+
+    # Close the database connection.
+    conn.close()
+
+    return result
+
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.

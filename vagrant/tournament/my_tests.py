@@ -84,11 +84,11 @@ def testReportMatches():
     registerPlayer("Boots O'Neal")
     registerPlayer("Cathy Burton")
     registerPlayer("Diane Grant")
-    #standings = playerStandings()
-    #[id1, id2, id3, id4] = [row[0] for row in standings]
-    # [id1, id2, id3, id4] = [row[0] for row in standings]
-    # reportMatch(id1, id2)
-    # reportMatch(id3, id4)
+    standings = playerStandings()
+    [id1, id2, id3, id4] = [row[0] for row in standings]
+    
+    reportMatch(id1, id2)
+    reportMatch(id3, id4)
     # reportMatch(6, 7)
     # reportMatch(8, 9)
     # reportMatch(6, 8)
