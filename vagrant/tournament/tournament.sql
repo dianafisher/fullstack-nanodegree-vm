@@ -30,7 +30,7 @@ CREATE TABLE matches (
 
 -- Create a view to hold the standings.
 
-CREATE VIEW match_count_view AS SELECT players.id, count(matches.player_id)::TEXT AS matches FROM players LEFT JOIN matches on players.id = matches.player_id GROUP BY players.id ORDER BY matches;
-CREATE VIEW match_wins_view AS SELECT players.id, count(matches.player_id)::TEXT AS wins FROM players LEFT JOIN matches ON players.id = matches.player_id AND matches.player_score = 3 GROUP BY players.id ORDER BY wins DESC;
-CREATE VIEW player_standings_view AS SELECT players.id, players.name, match_count_view.matches, match_wins_view.wins FROM players, match_count_view, match_wins_view WHERE players.id = match_count_view.id AND players.id = match_wins_view.id ORDER BY match_wins_view.wins DESC;
+CREATE VIEW match_count_view AS SELECT players.id, count(matches.player_id) AS matches FROM players LEFT JOIN matches on players.id = matches.player_id GROUP BY players.id ORDER BY matches;
+CREATE VIEW match_wins_view AS SELECT players.id, count(matches.player_id) AS wins FROM players LEFT JOIN matches ON players.id = matches.player_id AND matches.player_score = 3 GROUP BY players.id ORDER BY wins DESC;
+CREATE VIEW player_standings_view AS SELECT players.id, players.name, match_wins_view.wins, match_count_view.matches FROM players, match_wins_view, match_count_view WHERE players.id = match_count_view.id AND players.id = match_wins_view.id ORDER BY match_wins_view.wins DESC;
 

@@ -89,11 +89,7 @@ def testReportMatches():
     
     reportMatch(id1, id2)
     reportMatch(id3, id4)
-    # reportMatch(6, 7)
-    # reportMatch(8, 9)
-    # reportMatch(6, 8)
-    registerPlayer("Fred Flinstone");
-    """
+    
     standings = playerStandings()
     for (i, n, w, m) in standings:
         if m != 1:
@@ -104,13 +100,13 @@ def testReportMatches():
             raise ValueError("Each match loser should have zero wins recorded.")
     print "7. After a match, players have updated standings."          
     
-    """
+    
 if __name__ == '__main__':    
-    # testDeleteMatches()
-    # testDelete()
-    # testCount()
-    # testRegister()   
-    # testRegisterCountDelete()
-    # testStandingsBeforeMatches()
+    testDeleteMatches()
+    testDelete()
+    testCount()
+    testRegister()   
+    testRegisterCountDelete()
+    testStandingsBeforeMatches()
     testReportMatches()
     print "Success!  All tests pass!"
