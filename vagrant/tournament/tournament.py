@@ -116,7 +116,6 @@ def playerStandings():
     # Execute the SQL query to count the number of rows in the players table.
     c.execute("SELECT * FROM player_standings_view")
 
-    # The count will be the first column of the first and only row.
     result = c.fetchall()
 
     # Commit.
@@ -136,21 +135,15 @@ def reportMatch(winner, loser):
       loser:  the id number of the player who lost
     """
  
- # Open the database connection.
+    # Open the database connection.
     conn = connect()
     
     # Obtain a cursor.
     c = conn.cursor()
 
-    # Execute the SQL query to insert the winner and loser player ids into the matches table.
-
-    # c.execute("INSERT INTO matches VALUES (%s,%s) RETURNING id", (winner,loser,))
-    # query = "INSERT INTO matches VALUES (%s,%s) RETURNING id"
-    # c.execute(query, (winner, loser,))
-    # match_id = c.fetchone()[0]
-    # print 'just added match with id ', match_id
-
+    # Execute the SQL query to insert the winner and loser player ids into the matches table.    
     c.execute("INSERT INTO matches VALUES (%s,%s)", (winner, loser, ))    
+
     # Commit.
     conn.commit()
 
@@ -173,4 +166,22 @@ def swissPairings():
         name2: the second player's name
     """
 
+    # Open the database connection.
+    conn = connect()
+    
+    # Obtain a cursor.
+    c = conn.cursor()
+   
+    # Execute SQL query.
+    # This SQL query performs a self join on the player_standings_view to obtain tuples of players who have the same number of wins.
+    c.execute("SELECT a.id, a.name, b.id, b.name FROM player_standings_view AS a, player_standings_view AS b WHERE a.id < b.id AND a.wins = b.wins")
 
+    result = c.fetchall()
+
+    # Commit.
+    conn.commit()
+
+    # Close the database connection.
+    conn.close()
+
+    return result
