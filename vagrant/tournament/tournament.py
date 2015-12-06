@@ -150,12 +150,7 @@ def reportMatch(winner, loser):
     # match_id = c.fetchone()[0]
     # print 'just added match with id ', match_id
 
-    c.execute("INSERT INTO matches VALUES (%s,%s,%s)", (winner, loser, 3,))    
-    # Commit.
-    conn.commit()
-
-    c.execute("INSERT INTO matches VALUES (%s,%s,%s)", (loser, winner, 0,))
-    
+    c.execute("INSERT INTO matches VALUES (%s,%s)", (winner, loser, ))    
     # Commit.
     conn.commit()
 
