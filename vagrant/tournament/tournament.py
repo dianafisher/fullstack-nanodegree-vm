@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# 
+#
 # tournament.py -- implementation of a Swiss-system tournament
 #
 
@@ -15,7 +15,7 @@ def deleteMatches():
     """Remove all the match records from the database."""
     # Open the database connection.
     conn = connect()
-    
+
     # Obtain a cursor object from the connection.
     c = conn.cursor()
 
@@ -28,11 +28,12 @@ def deleteMatches():
     # Close the database connection.
     conn.close()
 
+
 def deletePlayers():
     """Remove all the player records from the database."""
     # Open the database connection.
     conn = connect()
-    
+
     # Obtain a cursor object from the connection.
     c = conn.cursor()
 
@@ -50,7 +51,7 @@ def countPlayers():
     """Returns the number of players currently registered."""
     # Open the database connection.
     conn = connect()
-    
+
     # Obtain a cursor object from the connection.
     c = conn.cursor()
 
@@ -65,12 +66,13 @@ def countPlayers():
 
     return result
 
+
 def registerPlayer(name):
     """Adds a player to the tournament database.
-  
+
     The database assigns a unique serial id number for the player.  (This
     should be handled by your SQL database schema, not in your Python code.)
-  
+
     Args:
       name: the player's full name (need not be unique).
     """
@@ -81,19 +83,20 @@ def registerPlayer(name):
     try:
         # Open the database connection.
         conn = connect()
-        
+
         # Obtain a cursor object from the connection.
         c = conn.cursor()
 
-        # Create the SQL query to insert the player name into the players table.
-        # Follows http://initd.org/psycopg/docs/usage.html to avoid SQL injection.
+        # Create query to insert the player name into the players table.
+        # Follows http://initd.org/psycopg/docs/usage.html to avoid SQL
+        # injection.
         query = "INSERT INTO players VALUES (%s)"
 
         # Hold the data to be inserted.
-        data = (name, )
+        data = (name,)
 
         # Execute the SQL query.
-        c.execute(query, data)    
+        c.execute(query, data)
 
         # Commit changes made to the database.
         conn.commit()
@@ -105,7 +108,7 @@ def registerPlayer(name):
 
         # Print error message
         print 'Error %s' % e
-    
+
     finally:
         # Close the database connection.
         if conn:
@@ -115,8 +118,8 @@ def registerPlayer(name):
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
 
-    The first entry in the list should be the player in first place, or a player
-    tied for first place if there is currently a tie.
+    The first entry in the list should be the player in first place,
+    or a player tied for first place if there is currently a tie.
 
     Returns:
       A list of tuples, each of which contains (id, name, wins, matches):
@@ -128,7 +131,7 @@ def playerStandings():
 
     # Open the database connection.
     conn = connect()
-    
+
     # Obtain a cursor object from the connection.
     c = conn.cursor()
 
@@ -137,7 +140,7 @@ def playerStandings():
 
     # Obtain the rows returned by the query.
     result = c.fetchall()
- 
+
     # Close the database connection.
     conn.close()
 
@@ -157,19 +160,20 @@ def reportMatch(winner, loser):
     try:
         # Open the database connection.
         conn = connect()
-        
+
         # Obtain a cursor object from the connection.
         c = conn.cursor()
 
-        # Create the SQL query to insert the winner and loser player ids.  
-        # Follows http://initd.org/psycopg/docs/usage.html to avoid SQL injection.
+        # Create the SQL query to insert the winner and loser player ids.
+        # Follows http://initd.org/psycopg/docs/usage.html to avoid SQL
+        # injection.
         query = "INSERT INTO matches VALUES (%s,%s)"
 
         # Hold the data to be inserted in a variable.
-        data = (winner, loser, )
+        data = (winner, loser,)
 
         # Execute the SQL query.
-        c.execute(query, data)    
+        c.execute(query, data)
 
         # Commit changes to the database.
         conn.commit()
@@ -181,20 +185,21 @@ def reportMatch(winner, loser):
 
         # Print error message
         print 'Error %s' % e
-    
+
     finally:
         # Close the database connection.
         if conn:
             conn.close()
- 
+
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
-  
+
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
     player with an equal or nearly-equal win record, that is, a player adjacent
     to him or her in the standings.
-  
+
     Returns:
       A list of tuples, each of which contains (id1, name1, id2, name2)
         id1: the first player's unique id
@@ -205,13 +210,16 @@ def swissPairings():
 
     # Open the database connection.
     conn = connect()
-    
+
     # Obtain a cursor object from the connection.
     c = conn.cursor()
-   
+
     # Execute SQL query.
-    # This SQL query performs a self join on the player_standings_view to obtain tuples of players having the same number of wins.
-    c.execute("SELECT a.id, a.name, b.id, b.name FROM player_standings_view AS a, player_standings_view AS b WHERE a.id < b.id AND a.wins = b.wins")
+    # This SQL query performs a self join on the player_standings_view to
+    # obtain tuples of players having the same number of wins.
+    c.execute(
+        "SELECT a.id, a.name, b.id, b.name FROM player_standings_view AS a, "
+        "player_standings_view AS b WHERE a.id < b.id AND a.wins = b.wins")
 
     # Obtain the rows returned by the query.
     result = c.fetchall()
