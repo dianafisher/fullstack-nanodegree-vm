@@ -1,6 +1,6 @@
 ## Tournament Results
 
-Tournament Results 
+Tournament Results keeps track of players and matches in a game tournment.  The tournament uses the Swiss system for pairing players in each round of the tournament. 
 
 ### Requirements
 - Vagrant VM (https://www.vagrantup.com/downloads)
@@ -22,4 +22,11 @@ Tournament Results
 
 	$ vagrant ssh
 
+4. Change directories to enter the tournament directory.
+
+	$ cd \vagrant\tournament
+
+5. Run the tournament_test.py script.
+
+	$ python tournament_test.py
 
