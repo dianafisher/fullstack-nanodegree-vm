@@ -48,6 +48,7 @@ Tournament Results keeps track of players and matches in a game tournment.  The 
 		CREATE VIEW
 		
 	The prompt should now be
+		
 		tournament=>
 
 7. Now that the database has been created you can run the tournament_test.py script.
