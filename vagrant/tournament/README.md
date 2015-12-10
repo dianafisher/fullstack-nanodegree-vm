@@ -47,6 +47,7 @@ Tournament Results keeps track of players and matches in a game tournment.  The 
 		CREATE VIEW
 		CREATE VIEW
 		
+	The prompt should now be
 		tournament=>
 
 7. Now that the database has been created you can run the tournament_test.py script.
@@ -55,13 +56,13 @@ Tournament Results keeps track of players and matches in a game tournment.  The 
 
 		tournament=> \q
 
-	Then ruun the tournament_test Python script
+	Then run the tournament_test Python script
 
 		$ python tournament_test.py
 
 	Alternatively, you can open a separate terminal and ssh into the Vagrant VM in the new terminal.
 
-	$ vagrant ssh
-	$ cd \vagrant\tournament
-	$ python tournament_test.py
+		$ vagrant ssh
+		$ cd \vagrant\tournament
+		$ python tournament_test.py
 
