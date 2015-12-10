@@ -5,6 +5,41 @@
 
 import psycopg2
 
+class DB:
+
+    def __init__(self, db_con_str="dbname=tournament"):
+        """
+        Creates a database connection with the connection string provided
+        :param str db_con_str: Contains the database connection string, 
+        with a default value when no argument is passed to the parameter
+        """
+        self.conn = psycopg2.connect(db_con_str)
+
+    def cursor(self):
+        """
+        Returns the current cursor of the database
+        """
+        return self.conn.cursor();
+
+    def execute(self, sql_query_string, and_close=False):
+        """
+        Executes SQL queries
+        :param str sql_query_string: Contain the query string to be executed
+        :param bool and_close: If true, closes the database connection after executing and commiting the SQL Query
+        """
+        cursor = self.cursor()
+        cursor.execute(sql_query_string)
+        if and_close:
+            self.conn.commit()
+            self.close()
+        return {"conn": self.conn, "cursor": cursor if not and_close else None}
+
+    def close(self):
+        """
+        Closes the current database connection
+        """
+        return self.conn.close()
+
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
@@ -13,58 +48,42 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    # Open the database connection.
-    conn = connect()
 
-    # Obtain a cursor object from the connection.
-    c = conn.cursor()
+    DB().execute("DELETE FROM matches", True)
 
-    # Execute the SQL query to clear the matches table.
-    c.execute("DELETE FROM matches")
+    # # Open the database connection.
+    # conn = connect()
 
-    # Commit.
-    conn.commit()
+    # # Obtain a cursor object from the connection.
+    # c = conn.cursor()
 
-    # Close the database connection.
-    conn.close()
+    # # Execute the SQL query to clear the matches table.
+    # c.execute("DELETE FROM matches")
+
+    # # Commit.
+    # conn.commit()
+
+    # # Close the database connection.
+    # conn.close()
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    # Open the database connection.
-    conn = connect()
 
-    # Obtain a cursor object from the connection.
-    c = conn.cursor()
-
-    # Execute the SQL query to clear the players table.
-    c.execute("DELETE FROM players")
-
-    # Commit.
-    conn.commit()
-
-    # Close the database connection.
-    conn.close()
+    DB().execute("DELETE FROM players", True)
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    # Open the database connection.
-    conn = connect()
 
-    # Obtain a cursor object from the connection.
-    c = conn.cursor()
-
-    # Execute the SQL query to count the number of rows in the players table.
-    c.execute("SELECT count(*) FROM players")
-
-    # The count will be the first column of the first and only row.
-    result = c.fetchall()[0][0]
-
-    # Close the database connection.
-    conn.close()
-
-    return result
+    conn = DB().execute("SELECT count(*) FROM players")
+    cursor = conn["cursor"].fetchall()
+    
+    # # Close the database connection.
+    conn["conn"].close()
+    
+    # return result
+    return cursor[0][0]    
 
 
 def registerPlayer(name):
@@ -215,11 +234,8 @@ def swissPairings():
     c = conn.cursor()
 
     # Execute SQL query.
-    # This SQL query performs a self join on the player_standings_view to
-    # obtain tuples of players having the same number of wins.
-    c.execute(
-        "SELECT a.id, a.name, b.id, b.name FROM player_standings_view AS a, "
-        "player_standings_view AS b WHERE a.id < b.id AND a.wins = b.wins")
+    # 
+    c.execute("SELECT oview.id, oview.name, eview.id, eview.name FROM eview, oview WHERE eview.num = oview.num");
 
     # Obtain the rows returned by the query.
     result = c.fetchall()
