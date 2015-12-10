@@ -37,7 +37,7 @@ CREATE VIEW player_standings_view AS select id, name, (SELECT count(*) FROM matc
 -- Create views to assist with grouping players for matches.  Even numbered rows will be held in one view and odd numbered rows will be held in another view.
 
 -- -- Create view to hold odd numbered rows in the player_standings_view.
-CREATE VIEW odds_view AS SELECT id, name, wins, rn FROM (SELECT id, name, wins, (row_number() OVER (ORDER BY wins DESC)) AS rn FROM player_standings_view) sub WHERE rn % 2 != 0;
+CREATE VIEW odd_rows_view AS SELECT id, name, wins, row_num FROM (SELECT id, name, wins, (row_number() OVER (ORDER BY wins DESC)) AS row_num FROM player_standings_view) sub WHERE row_num % 2 != 0;
 
 -- -- Create view to hold even numbered rows in the player_standings_view.
-CREATE VIEW evens_view AS SELECT id, name, wins, rn FROM (SELECT id, name, wins, (row_number() OVER (ORDER BY wins DESC)) AS rn FROM player_standings_view) sub WHERE rn % 2 = 0;
+CREATE VIEW even_rows_view AS SELECT id, name, wins, row_num FROM (SELECT id, name, wins, (row_number() OVER (ORDER BY wins DESC)) AS row_num FROM player_standings_view) sub WHERE row_num % 2 = 0;

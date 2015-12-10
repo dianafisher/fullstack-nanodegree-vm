@@ -21,18 +21,33 @@ class DB:
         """
         return self.conn.cursor();
 
-    def execute(self, sql_query_string, and_close=False):
+    def execute(self, sql_query_string, params=None, and_close=False):
         """
         Executes SQL queries
         :param str sql_query_string: Contain the query string to be executed
         :param bool and_close: If true, closes the database connection after executing and commiting the SQL Query
         """
-        cursor = self.cursor()
-        cursor.execute(sql_query_string)
-        if and_close:
-            self.conn.commit()
-            self.close()
-        return {"conn": self.conn, "cursor": cursor if not and_close else None}
+        try:            
+            cursor = self.cursor()
+            if params:
+                cursor.execute(sql_query_string, params)
+            else:       
+                cursor.execute(sql_query_string)            
+        
+        except psycopg2.DatabaseError, e:
+            # Rollback any changes
+            if self.conn:
+                self.conn.rollback()
+
+            # Print error message
+            print 'Error %s' % e
+
+        finally:            
+            if and_close:
+                self.conn.commit()
+                # Close the database connection.
+                self.close()
+            return {"conn": self.conn, "cursor": cursor if not and_close else None}    
 
     def close(self):
         """
@@ -49,28 +64,13 @@ def connect():
 def deleteMatches():
     """Remove all the match records from the database."""
 
-    DB().execute("DELETE FROM matches", True)
-
-    # # Open the database connection.
-    # conn = connect()
-
-    # # Obtain a cursor object from the connection.
-    # c = conn.cursor()
-
-    # # Execute the SQL query to clear the matches table.
-    # c.execute("DELETE FROM matches")
-
-    # # Commit.
-    # conn.commit()
-
-    # # Close the database connection.
-    # conn.close()
+    DB().execute("DELETE FROM matches", None, True)
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
 
-    DB().execute("DELETE FROM players", True)
+    DB().execute("DELETE FROM players", None, True)
 
 
 def countPlayers():
@@ -95,43 +95,17 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+       
+    # Create query to insert the player name into the players table.
+    # Follows http://initd.org/psycopg/docs/usage.html to avoid SQL
+    # injection.
+    query = "INSERT INTO players VALUES (%s)"
 
-    # Create empty connection object
-    conn = None
+    # Hold the data to be inserted.
+    data = (name,)
 
-    try:
-        # Open the database connection.
-        conn = connect()
-
-        # Obtain a cursor object from the connection.
-        c = conn.cursor()
-
-        # Create query to insert the player name into the players table.
-        # Follows http://initd.org/psycopg/docs/usage.html to avoid SQL
-        # injection.
-        query = "INSERT INTO players VALUES (%s)"
-
-        # Hold the data to be inserted.
-        data = (name,)
-
-        # Execute the SQL query.
-        c.execute(query, data)
-
-        # Commit changes made to the database.
-        conn.commit()
-
-    except psycopg2.DatabaseError, e:
-        # Rollback any changes.
-        if conn:
-            conn.rollback()
-
-        # Print error message
-        print 'Error %s' % e
-
-    finally:
-        # Close the database connection.
-        if conn:
-            conn.close()
+    # Execute the SQL query.    
+    DB().execute(query, data, True)    
 
 
 def playerStandings():
@@ -148,23 +122,14 @@ def playerStandings():
         matches: the number of matches the player has played
     """
 
-    # Open the database connection.
-    conn = connect()
-
-    # Obtain a cursor object from the connection.
-    c = conn.cursor()
-
-    # Execute the SQL query to count the number of rows in the players table.
-    c.execute("SELECT * FROM player_standings_view")
-
-    # Obtain the rows returned by the query.
-    result = c.fetchall()
-
-    # Close the database connection.
-    conn.close()
-
-    # Return the result.
-    return result
+    conn = DB().execute("SELECT * FROM player_standings_view")
+    cursor = conn["cursor"].fetchall()
+    
+    # # Close the database connection.
+    conn["conn"].close()
+    
+    # return result
+    return cursor 
 
 
 def reportMatch(winner, loser):
@@ -174,41 +139,17 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    conn = None
+    
+    # Create the SQL query to insert the winner and loser player ids.
+    # Follows http://initd.org/psycopg/docs/usage.html to avoid SQL
+    # injection.
+    query = "INSERT INTO matches VALUES (%s,%s)"
 
-    try:
-        # Open the database connection.
-        conn = connect()
+    # Hold the data to be inserted in a variable.
+    data = (winner, loser,)
 
-        # Obtain a cursor object from the connection.
-        c = conn.cursor()
-
-        # Create the SQL query to insert the winner and loser player ids.
-        # Follows http://initd.org/psycopg/docs/usage.html to avoid SQL
-        # injection.
-        query = "INSERT INTO matches VALUES (%s,%s)"
-
-        # Hold the data to be inserted in a variable.
-        data = (winner, loser,)
-
-        # Execute the SQL query.
-        c.execute(query, data)
-
-        # Commit changes to the database.
-        conn.commit()
-
-    except psycopg2.DatabaseError, e:
-        # Rollback any changes
-        if conn:
-            conn.rollback()
-
-        # Print error message
-        print 'Error %s' % e
-
-    finally:
-        # Close the database connection.
-        if conn:
-            conn.close()
+    # Execute the SQL query.    
+    DB().execute(query, data, True)    
 
 
 def swissPairings():
@@ -227,21 +168,11 @@ def swissPairings():
         name2: the second player's name
     """
 
-    # Open the database connection.
-    conn = connect()
-
-    # Obtain a cursor object from the connection.
-    c = conn.cursor()
-
-    # Execute SQL query.
-    # Match players by selecting one row each from the odd numbered rows and even numbered rows.
-    c.execute("select odds_view.id, odds_view.name, evens_view.id, evens_view.name FROM odds_view, evens_view WHERE evens_view.rn = odds_view.rn + 1");
-
-    # Obtain the rows returned by the query.
-    result = c.fetchall()
-
-    # Close the database connection.
-    conn.close()
-
-    # Return the result.
-    return result
+    conn = DB().execute("SELECT odd_rows_view.id, odd_rows_view.name, even_rows_view.id, even_rows_view.name FROM odd_rows_view, even_rows_view WHERE even_rows_view.row_num = odd_rows_view.row_num + 1")
+    cursor = conn["cursor"].fetchall()
+    
+    # # Close the database connection.
+    conn["conn"].close()
+    
+    # return result
+    return cursor     
