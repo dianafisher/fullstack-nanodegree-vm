@@ -34,12 +34,10 @@ CREATE UNIQUE INDEX matches_unique_idx ON matches
 -- Create a view to hold the player standings.
 CREATE VIEW player_standings_view AS select id, name, (SELECT count(*) FROM matches WHERE players.id = matches.winner_id) AS wins, (SELECT count(*) FROM matches WHERE players.id = matches.winner_id OR players.id = matches.loser_id) AS matches FROM players ORDER BY wins DESC;
 
--- Create views to assist with grouping players for matches.
+-- Create views to assist with grouping players for matches.  Even numbered rows will be held in one view and odd numbered rows will be held in another view.
 
--- Create view to select even numbered rows in the player_standings_view and hold them in a separate view.
-CREATE VIEW even_rows_view AS SELECT id, name, wins FROM (SELECT id, name, wins, (row_number() OVER (ORDER BY wins DESC)) % 2 AS rn FROM player_standings_view) sub WHERE sub.rn = 0;
--- Create view to select odd numbered rows in the player_standings_view and hold them in a separate view.
-CREATE VIEW odd_rows_view AS SELECT id, name, wins FROM (SELECT id, name, wins, (row_number() OVER (ORDER BY wins DESC)) % 2 AS rn FROM player_standings_view) sub WHERE sub.rn != 0;
+-- -- Create view to hold odd numbered rows in the player_standings_view.
+CREATE VIEW odds_view AS SELECT id, name, wins, rn FROM (SELECT id, name, wins, (row_number() OVER (ORDER BY wins DESC)) AS rn FROM player_standings_view) sub WHERE rn % 2 != 0;
 
-CREATE VIEW eview AS SELECT id, name, num FROM (SELECT id, name, (row_number() OVER (ORDER BY wins DESC)) AS num FROM even_rows_view) sub;
-CREATE VIEW oview AS SELECT id, name, num FROM (SELECT id, name, (row_number() OVER (ORDER BY wins DESC)) AS num FROM odd_rows_view) sub;
+-- -- Create view to hold even numbered rows in the player_standings_view.
+CREATE VIEW evens_view AS SELECT id, name, wins, rn FROM (SELECT id, name, wins, (row_number() OVER (ORDER BY wins DESC)) AS rn FROM player_standings_view) sub WHERE rn % 2 = 0;

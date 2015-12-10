@@ -124,6 +124,39 @@ def testPairings():
             "After one match, players with one win should be paired.")
     print "8. After one match, players with one win are paired."    
 
+def test4Pairings():
+    deleteMatches()
+    deletePlayers()
+    registerPlayer("Twilight Sparkle")
+    registerPlayer("Fluttershy")
+    registerPlayer("Applejack")
+    registerPlayer("Pinkie Pie")
+    registerPlayer("Twinkle Toes")
+    registerPlayer("Pixie Dust")
+    registerPlayer("Peter Pan")
+    registerPlayer("Rumplestilskin")
+
+    standings = playerStandings()
+    [id1, id2, id3, id4, id5, id6, id7, id8] = [row[0] for row in standings]
+    reportMatch(id1, id2)
+    reportMatch(id3, id4)
+    reportMatch(id5, id6)
+    reportMatch(id7, id8)
+    pairings = swissPairings()
+    print pairings
+
+    reportMatch(id1, id3)
+    reportMatch(id5, id7)
+    reportMatch(id8, id2)
+    reportMatch(id6, id4)
+    pairings = swissPairings()
+    print pairings
+
+
+    if len(pairings) != 4:
+        raise ValueError(
+            "For eight players, swissPairings should return four pairs.")
+
 def testMorePairings():
     deleteMatches()
     deletePlayers()
@@ -171,5 +204,6 @@ if __name__ == '__main__':
     testStandingsBeforeMatches()
     testReportMatches()
     testPairings()
+    test4Pairings()
     testMorePairings()
     print "Success!  All tests pass!"

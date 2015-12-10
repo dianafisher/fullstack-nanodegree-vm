@@ -234,8 +234,8 @@ def swissPairings():
     c = conn.cursor()
 
     # Execute SQL query.
-    # 
-    c.execute("SELECT oview.id, oview.name, eview.id, eview.name FROM eview, oview WHERE eview.num = oview.num");
+    # Match players by selecting one row each from the odd numbered rows and even numbered rows.
+    c.execute("select odds_view.id, odds_view.name, evens_view.id, evens_view.name FROM odds_view, evens_view WHERE evens_view.rn = odds_view.rn + 1");
 
     # Obtain the rows returned by the query.
     result = c.fetchall()
