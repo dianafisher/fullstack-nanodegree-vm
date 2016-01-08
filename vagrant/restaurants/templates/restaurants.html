@@ -12,8 +12,10 @@
 		<div id='restaurant'>
 			<span class='name'><p>{{r.name}}</p></span>
 		</div>
+		<a href='{{url_for('showMenu', restaurant_id=r.id)}}'>View Menu</a>
+		</br>
 		<a href='{{url_for('editRestaurant', restaurant_id=r.id)}}'>Edit</a>
-	
+		</br>
 		<a href='{{url_for('deleteRestaurant', restaurant_id=r.id)}}'>Delete</a>
 			{% endfor %}
 		{% endif %}
