@@ -14,7 +14,7 @@ session = DBSession()
 # #Fake Restaurants
 # restaurant = {'name': 'The CRUDdy Crab', 'id': '1'}
 
-restaurants = [{'name': 'The CRUDdy Crab', 'id': '1'}, {'name':'Blue Burgers', 'id':'2'},{'name':'Taco Hut', 'id':'3'}]
+# restaurants = [{'name': 'The CRUDdy Crab', 'id': '1'}, {'name':'Blue Burgers', 'id':'2'},{'name':'Taco Hut', 'id':'3'}]
 
 
 # #Fake Menu Items
@@ -28,23 +28,44 @@ restaurants = [{'name': 'The CRUDdy Crab', 'id': '1'}, {'name':'Blue Burgers', '
 @app.route('/restaurants')
 # List restaurants
 def listRestaurants():
-	# query = session.query(Restaurant).all()
-	# for r in query:
-	# 	print r.name
+	# query the database
+	restaurants = session.query(Restaurant).all()	
 
-	# print restaurants
-	return render_template('restaurants.html', restaurants=restaurants)
-	# return "page to list all restaurants"
+	# return list of restaurants found
+	return render_template('restaurants.html', restaurants=restaurants)	
 
 # Create a new restaurant
 @app.route('/restaurant/new/', methods=['GET', 'POST'])
 def newRestaurant():
-	return "page to create a new restaurant"
+	# Handle POST request
+	if request.method == 'POST':
+		restauraunt = Restaurant(name = request.form['name'])		
+		session.add(restauraunt)
+		session.commit()
+		# flash("new restaurant created!")
+
+		# Redirect back to the main page
+		return redirect(url_for('listRestaurants'))
+	else:
+		# Handle GET request
+		return render_template('newrestaurant.html')
+	# return "page to create a new restaurant"
 
 # Edit a restaurant
 @app.route('/restaurant/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
 def editRestaurant(restaurant_id):
-	return "page to edit a restaurant"
+	editedRestaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
+	# Handle POST request
+	if request.method == 'POST':
+		if request.form['name']:
+			editedRestaurant.name = request.form['name']
+		session.add(editedRestaurant)
+		session.commit()
+		# flash("Restaurant edited!")
+		return redirect(url_for('listRestaurants', restaurant_id = restaurant_id))
+	else:	
+		# Handle GET request	
+		return render_template('editrestaurant.html', restaurant_id = restaurant_id, restaurant = editedRestaurant)	
 
 # Delete a restaurant
 @app.route('/restaurant/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
