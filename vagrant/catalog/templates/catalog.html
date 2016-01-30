@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+{% block content %}
+	
+	{% if categories %}
+		{% for c in categories %}
+		<div id='category'>
+			<span class='category-name'><p>{{c.name}}</p></span>
+		</div>
+		{% endfor %}
+	{% endif %}
+
+{% endblock %}
