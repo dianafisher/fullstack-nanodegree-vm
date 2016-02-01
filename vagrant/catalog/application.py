@@ -41,11 +41,9 @@ def index():
 	categories = session.query(Category).order_by(asc(Category.name))
 
 	# get the latest added items.
-	items = session.query(Item).order_by(desc(Item.dateAdded))
-	for i in items:
-		print i.name
+	items = session.query(Item).order_by(desc(Item.dateAdded))	
 
-	return render_template('catalog.html', categories=categories)	
+	return render_template('catalog.html', categories=categories, items=items)	
 	# return 'Categories appear here.  Latest added items also appear.'
 
 # Show items in a category (by id)
@@ -119,8 +117,11 @@ def deleteItem(category_name, item_name):
 ### JSON API endpoints ###
 
 # Get entire catalog
-@app.route('/catalog/JSON')
+@app.route('/catalog.json')
 def catalogJSON():
+	# get the categories from the database.
+	categories = session.query(Category).order_by(asc(Category.name))
+
 	return {}
 
 # Get a category
@@ -133,7 +134,7 @@ def categoryJSON(category_id):
 def itemJSON(item_id):
 	return {}
 
-### ATOM endpoint ###
+### ATOM feed endpoint ###
 @app.route('/catalog/recent.atom')
 def recent_feed():
 	feed = AtomFeed('Recent Items',
@@ -154,7 +155,7 @@ def recent_feed():
 		entry = FeedEntry(item.name, item.description,
 			content_type='html',
 			author=author,
-			links=[{'href' : 'none'}],
+			# links=[{'href' : 'none'}],
 			categories=[{'term' : 'sports'}],
 			added=item.dateAdded,
 			id=request.url_root + 'catalog/items/' + str(item.id),

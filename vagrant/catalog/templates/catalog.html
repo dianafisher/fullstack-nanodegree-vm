@@ -1,6 +1,6 @@
 {% extends "index.html" %}
 {% block content %}
-	
+	<h2>Categories</h2>
 	{% if categories %}
 		{% for c in categories %}
 		<div id='category'>
@@ -8,5 +8,15 @@
 		</div>
 		{% endfor %}
 	{% endif %}
+	<div id="latest-items">
+	<h2>Latest Items</h2>
+	{% if items %}
+		{% for item in items %}
+		<div id='item'>			
+			<span class='item-name'><p>{{ item.name }}</p></span>
+		</div>
+		{% endfor %}
+	{% endif %}
+	</div>
 
 {% endblock %}
