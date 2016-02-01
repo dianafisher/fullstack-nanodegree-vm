@@ -95,13 +95,16 @@ def newItem(category_name):
 	return 'Page to add an item to a category.'	
 
 # Update (edit) item (by id)
-@app.route('/catalog/<int:category_id>/items/<int:item_id>/edit', methods=['GET', 'POST'])
-def editItem(category_id, item_id):
+@app.route('/catalog/items/<int:item_id>/edit', methods=['GET', 'POST'])
+def editItem(item_id):
 	return 'Page to edit an item'
+# @app.route('/catalog/<int:category_id>/items/<int:item_id>/edit', methods=['GET', 'POST'])
+# def editItem(category_id, item_id):
+# 	return 'Page to edit an item'
 
 # Update (edit) item (by name)
 @app.route('/catalog/<category_name>/<item_name>/edit', methods=['GET', 'POST'])
-def editItem(category_name, item_name):
+def editItemWithName(category_name, item_name):
 	return 'Page to edit an item'
 
 # Delete item (by id)	
@@ -111,7 +114,7 @@ def deleteItem(category_id, item_id):
 
 # Delete item (by name)
 @app.route('/catalog/<category_name>/<item_name>/delete', methods=['GET', 'POST'])
-def deleteItem(category_name, item_name):
+def deleteItemWithName(category_name, item_name):
 	return 'Page to delete an item'
 
 ### JSON API endpoints ###
