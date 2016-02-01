@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
 app = Flask(__name__)
 
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item, User
 
@@ -19,7 +19,7 @@ import requests
 
 # imports for Atom feed
 from urlparse import urljoin
-from werkzeug.contrib.atom import AtomFeed
+from werkzeug.contrib.atom import AtomFeed, FeedEntry
 
 # Connect to the catalog database and create database session
 engine = create_engine('sqlite:///df_catalog.db')
@@ -37,9 +37,14 @@ def make_external(url):
 @app.route('/')
 @app.route('/catalog/')
 def index():
+	# get the categories from the database.
 	categories = session.query(Category).order_by(asc(Category.name))
-	for c in categories:
-		print c.name
+
+	# get the latest added items.
+	items = session.query(Item).order_by(desc(Item.dateAdded))
+	for i in items:
+		print i.name
+
 	return render_template('catalog.html', categories=categories)	
 	# return 'Categories appear here.  Latest added items also appear.'
 
@@ -132,14 +137,42 @@ def itemJSON(item_id):
 @app.route('/catalog/recent.atom')
 def recent_feed():
 	feed = AtomFeed('Recent Items',
-		feed_url = request.url, url = request.url_root)
+		feed_url = request.url, 
+		url = request.url_root,
+		subtitle="Most recent items.")
 
 	items = session.query(Item).order_by(asc(Item.dateAdded))
-
+	print 
 	for item in items:
-		feed.add(item.name, unicode(item.description),
+		print item.category.name	
+		categories = []	
+		cat = {'term' : 'sports', 'label': 'none'}				
+		categories.append(cat)
+		print categories
+		author = {'name': 'unknown', 'email': 'unknown@gmail.com'}
+
+		entry = FeedEntry(item.name, item.description,
 			content_type='html',
-			added=item.dateAdded)
+			author=author,
+			links=[{'href' : 'none'}],
+			categories=[{'term' : 'sports'}],
+			added=item.dateAdded,
+			id=request.url_root + 'catalog/items/' + str(item.id),
+			published=item.dateAdded,
+			updated=item.lastUpdated)
+
+		# print entry.to_string()
+
+		feed.add(entry)
+		# feed.add(item.name, unicode(item.description),
+		# 	content_type='html',
+		# 	author=author,
+		# 	categories=[item.category.name],
+		# 	added=item.dateAdded,
+		# 	id=request.url_root + 'catalog/items/' + str(item.id),
+		# 	published=item.dateAdded,
+		# 	updated=item.lastUpdated
+		# 	)
 
 	return feed.get_response()
 
