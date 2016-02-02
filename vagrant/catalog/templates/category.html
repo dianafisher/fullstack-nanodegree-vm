@@ -1,0 +1,13 @@
+{% extends "index.html" %}
+{% block content %}
+	{% if category %}
+		<h2>{{category.name}} Items</h2>
+	{% endif %}
+	{% if items %}
+		{% for item in items %}
+		<div id='item'>		
+			<a href="{{ (url_for('viewItem', category_name=item.category.name, item_name=item.name)) }}">{{ item.name }} </a>			
+		</div>
+		{% endfor %}
+	{% endif %}
+{% endblock %}

@@ -47,15 +47,17 @@ def index():
 	# return 'Categories appear here.  Latest added items also appear.'
 
 # Show items in a category (by id)
-@app.route('/catalog/<int:category_id>/')
-def showCategory(category_id):
-	return 'Page to show items in a category.'
+# @app.route('/catalog/<int:category_id>/')
+# def showCategory(category_id):
+# 	return 'Page to show items in a category.'
 
 # Show items in a category (by category name)
 @app.route('/catalog/<category_name>')
 def showCategory(category_name):
-	response = 'Page to show items in a category %s.' % category_name
-	return response
+	category = session.query(Category).filter_by(name = category_name).one()
+	items = session.query(Item).filter_by(category_id = category.id)	
+	
+	return render_template('category.html', category=category, items=items)	
 
 # Create new category
 @app.route('/catalog/category/new', methods=['GET', 'POST'])
@@ -93,6 +95,13 @@ def newItem(category_id):
 @app.route('/catalog/<category_name>/items/new', methods=['GET','POST'])
 def newItem(category_name):
 	return 'Page to add an item to a category.'	
+
+# View item
+@app.route('/catalog/<category_name>/<item_name>', methods=['GET', 'POST'])
+def viewItem(category_name, item_name):
+	category = session.query(Category).filter_by(name = category_name).one()
+	item = session.query(Item).filter_by(category_id = category.id, name=item_name).one()	
+	return render_template('item.html', item=item)	
 
 # Update (edit) item (by id)
 @app.route('/catalog/items/<int:item_id>/edit', methods=['GET', 'POST'])
