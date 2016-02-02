@@ -21,6 +21,26 @@ import requests
 from urlparse import urljoin
 from werkzeug.contrib.atom import AtomFeed, FeedEntry
 
+from jinja2 import Markup
+
+class Momentjs(object):
+    def __init__(self, timestamp):
+        self.timestamp = timestamp
+
+    def render(self, format):
+        return Markup(
+            "<script>\ndocument.write(moment(\"%s\").%s);\n</script>" %
+            (self.timestamp.strftime("%Y-%m-%dT%H:%M:%S Z"), format))
+
+    def format(self, fmt):
+        return self.render("format(\"%s\")" % fmt)
+
+    def calendar(self):
+        return self.render("calendar()")
+
+    def fromNow(self):
+        return self.render("fromNow()")
+
 # Connect to the catalog database and create database session
 engine = create_engine('sqlite:///df_catalog.db')
 Base.metadata.bind = engine
@@ -101,7 +121,8 @@ def newItem(category_name):
 def viewItem(category_name, item_name):
 	category = session.query(Category).filter_by(name = category_name).one()
 	item = session.query(Item).filter_by(category_id = category.id, name=item_name).one()	
-	return render_template('item.html', item=item)	
+	updated = Momentjs(item.lastUpdated).fromNow()
+	return render_template('item.html', item=item, updated=updated)	
 
 # Update (edit) item (by id)
 @app.route('/catalog/items/<int:item_id>/edit', methods=['GET', 'POST'])
