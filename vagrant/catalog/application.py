@@ -21,8 +21,20 @@ import requests
 from urlparse import urljoin
 from werkzeug.contrib.atom import AtomFeed, FeedEntry
 
+from datetime import datetime
+# imports for momentjs (for displaying relative dates)
 from jinja2 import Markup
 
+# impports for file upload
+import os
+from werkzeug import secure_filename
+from flask import send_from_directory
+
+UPLOAD_FOLDER = './uploads'
+ALLOWED_EXTENSIONS =  set(['png', 'jpg', 'jpeg', 'gif'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Create a class to wrap the moment.js calls
 class Momentjs(object):
     def __init__(self, timestamp):
         self.timestamp = timestamp
@@ -66,11 +78,6 @@ def index():
 	return render_template('catalog.html', categories=categories, items=items)	
 	# return 'Categories appear here.  Latest added items also appear.'
 
-# Show items in a category (by id)
-# @app.route('/catalog/<int:category_id>/')
-# def showCategory(category_id):
-# 	return 'Page to show items in a category.'
-
 # Show items in a category (by category name)
 @app.route('/catalog/<category_name>')
 def showCategory(category_name):
@@ -107,18 +114,38 @@ def deleteCategory(category_name):
 ### Items ####
 
 # Create new item (using category_id)
-@app.route('/catalog/<int:category_id>/items/new', methods=['GET','POST'])
-def newItem(category_id):
-	return 'Page to add an item to a category.'
+# @app.route('/catalog/<int:category_id>/items/new', methods=['GET','POST'])
+# def newItem(category_id):
+# 	return 'Page to add an item to a category.'
 
 # Create new item (using category_name)
 @app.route('/catalog/<category_name>/items/new', methods=['GET','POST'])
 def newItem(category_name):
+	if request.method == 'POST':
+		# Create the new item
+		print 'adding item to category %s' % category_name
+		category = session.query(Category).filter_by(name = category_name).one()
+		newItem = Item(
+			name=request.form['name'], 
+			category=category,
+			dateAdded=datetime.utcnow(),
+			lastUpdated=datetime.utcnow()
+		)
+		session.add(newItem)		
+		session.commit()
+
+		flash('New Item %s Successfully Created' % newItem.name)
+		# redirect to show the items in the category.
+		return redirect(url_for('showCategory', category_name=category_name))
+	else:
+		return render_template('newItem.html')
+			
 	return 'Page to add an item to a category.'	
 
 # View item
 @app.route('/catalog/<category_name>/<item_name>', methods=['GET', 'POST'])
 def viewItem(category_name, item_name):
+	print 'view item from category %s' % category_name
 	category = session.query(Category).filter_by(name = category_name).one()
 	item = session.query(Item).filter_by(category_id = category.id, name=item_name).one()	
 	updated = Momentjs(item.lastUpdated).fromNow()
@@ -146,6 +173,54 @@ def deleteItem(category_id, item_id):
 @app.route('/catalog/<category_name>/<item_name>/delete', methods=['GET', 'POST'])
 def deleteItemWithName(category_name, item_name):
 	return 'Page to delete an item'
+
+### File Uploads ###
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+@app.route('/catalog/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            print url_for('uploaded_file',filename=filename)
+            return redirect(url_for('uploaded_file',
+                                    filename=filename))
+    return '''
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form action="" method=post enctype=multipart/form-data>
+      <p><input type=file name=file>
+         <input type=submit value=Upload>
+    </form>
+    '''
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+	return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
+
+# photos = UploadSet('photos', IMAGES)
+
+# @app.route('/upload', methods=['GET', 'POST'])
+# def upload():
+# 	if request.method == 'POST' and 'photo' in request.files:
+# 		filename = photos.save(request.files['photo'])
+# 		rec = Photo(filename=filename, user=g.user.id)
+# 		rec.store()
+# 		flash("Photo saved.")
+# 		return redirect(url_for('show', id=rec.id))
+# 	return render_template('upload.html')
+
+# @app.route('/photo/<id>')
+# def show(id):
+# 	photo = Photo.load(id)
+# 	if photo is None:
+# 		abort(404)
+# 	url = photos.url(photo.filename)
+# 	return render_template('show.html', url=url, photo=photo)
 
 ### JSON API endpoints ###
 
