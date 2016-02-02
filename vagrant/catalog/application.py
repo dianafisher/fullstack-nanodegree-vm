@@ -107,10 +107,18 @@ def newItem(category_name):
 	if request.method == 'POST':
 		# Create the new item
 		print 'adding item to category %s' % category_name
+				
+		file = request.files['file']
+		if file and allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
 		category = session.query(Category).filter_by(name = category_name).one()
 		newItem = Item(
 			name=request.form['name'], 
 			category=category,
+			description=request.form['description'],
+			imageFilename=filename,
 			dateAdded=datetime.utcnow(),
 			lastUpdated=datetime.utcnow()
 		)
@@ -128,7 +136,8 @@ def newItem(category_name):
 # View item
 @app.route('/catalog/<category_name>/<item_name>', methods=['GET', 'POST'])
 def viewItem(category_name, item_name):
-	print 'view item from category %s' % category_name
+	"""Renders view to display item information.
+	"""
 	category = session.query(Category).filter_by(name = category_name).one()
 	item = session.query(Item).filter_by(category_id = category.id, name=item_name).one()	
 	updated = momentjs.Momentjs(item.lastUpdated).fromNow()
@@ -158,32 +167,32 @@ def deleteItemWithName(category_name, item_name):
 	return 'Page to delete an item'
 
 ### File Uploads ###
+
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+	"""Checks if filename has one of the allowed extensions as defined in ALLOWED_EXTENSIONS.	
+	"""
+	return '.' in filename and \
+		filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 @app.route('/catalog/upload', methods=['GET', 'POST'])
 def upload_file():
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            print url_for('uploaded_file',filename=filename)
-            return redirect(url_for('uploaded_file',
+	"""Uploads file to the 'uploads' directory.	
+	"""
+	if request.method == 'POST':
+		file = request.files['file']
+		if file and allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			print url_for('uploaded_file',filename=filename)
+			return redirect(url_for('uploaded_file',
                                     filename=filename))
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form action="" method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
-    </form>
-    '''
+	else:
+		return render_template('upload.html')
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
 	return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
+
 
 # photos = UploadSet('photos', IMAGES)
 
