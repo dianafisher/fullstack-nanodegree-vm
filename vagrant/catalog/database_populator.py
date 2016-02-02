@@ -20,6 +20,7 @@ game1= Item(
 	name="LEGO Dimensions", 
 	description="Combine building and crazy mash-up gaming with this LEGO DIMENSIONS Starter Pack, including game disc, LEGO Toy Pad with Gateway bricks, 3 minifigures and a 3-in-1 Batmobile.", 
 	category=cat1,
+	imageFilename='hp_lego_cake.jpeg',
 	dateAdded=datetime.utcnow(),
 	lastUpdated=datetime.utcnow())
 session.add(game1)
@@ -29,6 +30,7 @@ game2= Item(
 	name="LEGO Marvel's Avengers",
 	description="Avengers Assemble! Experience the first console videogame featuring characters and storylines from the blockbuster film Marvel's The Avengers and the much anticipated sequel Marvel's Avengers: Age of Ultron, and more. Play as the most powerful Super Heroes in their quest to save humanity.",
 	category=cat1,
+	imageFilename='starwars_comic.jpg',
 	dateAdded=datetime.utcnow(),
 	lastUpdated=datetime.utcnow())
 session.add(game2)

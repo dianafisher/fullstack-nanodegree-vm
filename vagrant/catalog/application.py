@@ -21,37 +21,20 @@ import requests
 from urlparse import urljoin
 from werkzeug.contrib.atom import AtomFeed, FeedEntry
 
-from datetime import datetime
 # imports for momentjs (for displaying relative dates)
-from jinja2 import Markup
+import momentjs
+from datetime import datetime
+
 
 # impports for file upload
 import os
 from werkzeug import secure_filename
 from flask import send_from_directory
 
+# Configure file upload directory and allowed extensions
 UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS =  set(['png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Create a class to wrap the moment.js calls
-class Momentjs(object):
-    def __init__(self, timestamp):
-        self.timestamp = timestamp
-
-    def render(self, format):
-        return Markup(
-            "<script>\ndocument.write(moment(\"%s\").%s);\n</script>" %
-            (self.timestamp.strftime("%Y-%m-%dT%H:%M:%S Z"), format))
-
-    def format(self, fmt):
-        return self.render("format(\"%s\")" % fmt)
-
-    def calendar(self):
-        return self.render("calendar()")
-
-    def fromNow(self):
-        return self.render("fromNow()")
 
 # Connect to the catalog database and create database session
 engine = create_engine('sqlite:///df_catalog.db')
@@ -148,7 +131,7 @@ def viewItem(category_name, item_name):
 	print 'view item from category %s' % category_name
 	category = session.query(Category).filter_by(name = category_name).one()
 	item = session.query(Item).filter_by(category_id = category.id, name=item_name).one()	
-	updated = Momentjs(item.lastUpdated).fromNow()
+	updated = momentjs.Momentjs(item.lastUpdated).fromNow()
 	return render_template('item.html', item=item, updated=updated)	
 
 # Update (edit) item (by id)

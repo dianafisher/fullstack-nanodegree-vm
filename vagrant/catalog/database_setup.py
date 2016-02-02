@@ -43,7 +43,7 @@ class Item(Base):
 	dateAdded = Column(DateTime)
 	lastUpdated = Column(DateTime)
 	description = Column(String(250))
-	imagePath = Column(String(250))
+	imageFilename = Column(String(250))
 	
 	# make a foreign key reference to the Category in which this item resides
 	category_id = Column(Integer, ForeignKey('category.id'))
@@ -57,7 +57,8 @@ class Item(Base):
 			'id'	: self.id,
 			'dateAdded'	: self.dateAdded,
 			'lastUpdated' : self.lastUpdated,
-			'description'	: self.description
+			'description'	: self.description,
+			'imageFilename'	: self.imageFilename
 		}
 
 engine = create_engine('sqlite:///df_catalog.db')
