@@ -143,18 +143,33 @@ def viewItem(category_name, item_name):
 	updated = momentjs.Momentjs(item.lastUpdated).fromNow()
 	return render_template('item.html', item=item, updated=updated)	
 
-# Update (edit) item (by id)
-@app.route('/catalog/items/<int:item_id>/edit', methods=['GET', 'POST'])
-def editItem(item_id):
-	return 'Page to edit an item'
-# @app.route('/catalog/<int:category_id>/items/<int:item_id>/edit', methods=['GET', 'POST'])
-# def editItem(category_id, item_id):
-# 	return 'Page to edit an item'
-
-# Update (edit) item (by name)
+# Update (edit) item
 @app.route('/catalog/<category_name>/<item_name>/edit', methods=['GET', 'POST'])
-def editItemWithName(category_name, item_name):
-	return 'Page to edit an item'
+def editItem(category_name, item_name):
+	category = session.query(Category).filter_by(name = category_name).one()
+	editedItem = session.query(Item).filter_by(category_id = category.id, name=item_name).one()
+
+	if request.method == 'POST':
+		if request.form['name']:
+			editedItem.name = request.form['name']		
+
+		if request.form['description']:
+			editedItem.description = request.form['description']				
+
+		file = request.files['file']
+		if file and allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			editedItem.imageFilename=filename
+		
+		editedItem.lastUpdated=datetime.utcnow()
+		session.add(editedItem)
+		session.commit()
+		flash('Item successfully edited')
+		return redirect(url_for('viewItem', category_name=category_name, item_name=editedItem.name))
+	else:
+		return render_template('editItem.html', item=editedItem)
+	
 
 # Delete item (by id)	
 @app.route('/catalog/<int:category_id>/items/<int:item_id>/delete', methods=['GET', 'POST'])
