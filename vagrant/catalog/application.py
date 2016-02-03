@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
-app = Flask(__name__)
 
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
@@ -30,6 +29,13 @@ from datetime import datetime
 import os
 from werkzeug import secure_filename
 from flask import send_from_directory
+
+# imports for preventing cross-site request forgery
+from flask.ext.seasurf import SeaSurf
+
+app = Flask(__name__)
+
+csrf = SeaSurf(app)
 
 # Configure file upload directory and allowed extensions
 UPLOAD_FOLDER = './uploads'
