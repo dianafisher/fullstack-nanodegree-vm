@@ -96,24 +96,23 @@ def deleteCategory(category_name):
 
 ### Items ####
 
-# Create new item (using category_id)
-# @app.route('/catalog/<int:category_id>/items/new', methods=['GET','POST'])
-# def newItem(category_id):
-# 	return 'Page to add an item to a category.'
-
-# Create new item (using category_name)
+# Create new item
 @app.route('/catalog/<category_name>/items/new', methods=['GET','POST'])
 def newItem(category_name):
+	"""Creates a new item in the databse.
+	"""
 	if request.method == 'POST':
 		# Create the new item
-		print 'adding item to category %s' % category_name
-				
+		
+		# If an image has been uploaded, save it to the file system.		
 		file = request.files['file']
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
+		# Get the category from the database by the category name.
 		category = session.query(Category).filter_by(name = category_name).one()
+		# Create a new item object.
 		newItem = Item(
 			name=request.form['name'], 
 			category=category,
@@ -122,16 +121,17 @@ def newItem(category_name):
 			dateAdded=datetime.utcnow(),
 			lastUpdated=datetime.utcnow()
 		)
+		# Commit the new item to the databse.
 		session.add(newItem)		
 		session.commit()
 
+		# Inform the user.
 		flash('New Item %s Successfully Created' % newItem.name)
-		# redirect to show the items in the category.
+		# Redirect to show the items in the category.
 		return redirect(url_for('showCategory', category_name=category_name))
 	else:
-		return render_template('newItem.html')
-			
-	return 'Page to add an item to a category.'	
+		# GET request, so show the page to create a new item.
+		return render_template('newItem.html')			
 
 # View item
 @app.route('/catalog/<category_name>/<item_name>', methods=['GET', 'POST'])
@@ -143,7 +143,7 @@ def viewItem(category_name, item_name):
 	updated = momentjs.Momentjs(item.lastUpdated).fromNow()
 	return render_template('item.html', item=item, updated=updated)	
 
-# Update (edit) item
+# Update/Edit item
 @app.route('/catalog/<category_name>/<item_name>/edit', methods=['GET', 'POST'])
 def editItem(category_name, item_name):
 	category = session.query(Category).filter_by(name = category_name).one()
@@ -171,12 +171,7 @@ def editItem(category_name, item_name):
 		return render_template('editItem.html', item=editedItem)
 	
 
-# Delete item (by id)	
-@app.route('/catalog/<int:category_id>/items/<int:item_id>/delete', methods=['GET', 'POST'])
-def deleteItem(category_id, item_id):
-	return 'Page to delete an item'
-
-# Delete item (by name)
+# Delete item
 @app.route('/catalog/<category_name>/<item_name>/delete', methods=['GET', 'POST'])
 def deleteItemWithName(category_name, item_name):
 	return 'Page to delete an item'
