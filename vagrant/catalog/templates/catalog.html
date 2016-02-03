@@ -1,6 +1,9 @@
 {% extends "index.html" %}
 {% block content %}
-	<h2>Categories</h2>
+{% include "header.html" %}
+{% include 'flash.html' %}
+	<h2>Categories</h2>	
+
 	{% if categories %}
 		{% for c in categories %}
 		<div id='category'>

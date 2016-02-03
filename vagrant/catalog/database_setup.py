@@ -12,7 +12,7 @@ class User(Base):
 	id = Column(Integer, primary_key=True)
 	name = Column(String(250), nullable=False)
 	email = Column(String(250), nullable=False)
-	photo = Column(String(250))
+	picture = Column(String(250))
 	last_seen = Column(DateTime)
 
 	@property
@@ -24,7 +24,7 @@ class Category(Base):
 	__tablename__ = 'category'
 
 	id = Column(Integer, primary_key=True)
-	name = Column(String(250), nullable=False, unique=True)
+	name = Column(String(250), nullable=False, unique=True)	
 
 	@property
 	def serialize(self):
@@ -44,6 +44,8 @@ class Item(Base):
 	lastUpdated = Column(DateTime)
 	description = Column(String(250))
 	imageFilename = Column(String(250))
+	user_id = Column(Integer, ForeignKey('user.id'))
+	user = relationship(User)
 	
 	# make a foreign key reference to the Category in which this item resides
 	category_id = Column(Integer, ForeignKey('category.id'))
@@ -61,7 +63,7 @@ class Item(Base):
 			'imageFilename'	: self.imageFilename
 		}
 
-engine = create_engine('sqlite:///df_catalog.db')
+engine = create_engine('sqlite:///minifigures.db')
  
 
 Base.metadata.create_all(engine)
