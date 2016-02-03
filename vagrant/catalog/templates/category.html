@@ -14,6 +14,7 @@
 		{% for item in items %}
 		<div id='item'>		
 			<a href="{{ (url_for('viewItem', category_name=item.category.name, item_name=item.name)) }}">{{ item.name }} </a>			
+			<a href='{{url_for('deleteItem', category_name=item.category.name, item_name=item.name)}}'>Delete</a>
 		</div>
 		{% endfor %}
 	{% endif %}

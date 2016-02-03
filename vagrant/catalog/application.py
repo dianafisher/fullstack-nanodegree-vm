@@ -173,8 +173,17 @@ def editItem(category_name, item_name):
 
 # Delete item
 @app.route('/catalog/<category_name>/<item_name>/delete', methods=['GET', 'POST'])
-def deleteItemWithName(category_name, item_name):
-	return 'Page to delete an item'
+def deleteItem(category_name, item_name):
+	category = session.query(Category).filter_by(name = category_name).one()
+	itemToDelete = session.query(Item).filter_by(category_id = category.id, name=item_name).one()
+
+	if request.method == 'POST':
+		session.delete(itemToDelete)
+		session.commit()
+		flash("Item deleted!")
+		return redirect(url_for('showCategory', category_name = category_name))
+	else:
+		return render_template('deleteItem.html', category_name = category_name, item_name = item_name, item = itemToDelete)	
 
 ### File Uploads ###
 
