@@ -37,8 +37,10 @@ from flask.ext.seasurf import SeaSurf
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = 'Catalog Appliction'
 
+# Create the app
 app = Flask(__name__)
 
+# Add SeaSurf for cross-site request forgery prevention
 csrf = SeaSurf(app)
 
 # Configure file upload directory and allowed extensions
@@ -46,7 +48,7 @@ UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS =  set(['png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Connect to the catalog database and create database session
+# Connect to the database and create database session
 engine = create_engine('sqlite:///minifigures.db')
 Base.metadata.bind = engine
 
@@ -102,20 +104,6 @@ def newCategory():
 # Edit Category
 @app.route('/catalog/<category_name>/edit', methods=['GET', 'POST'])
 def editCategory(category_name):
-	return 'Page to edit a category %s.' % category_name	
-
-# Delete Category
-@app.route('/catalog/<category_name>/delete', methods=['GET', 'POST'])
-def deleteCategory(category_name):
-	return 'Page to delete category %s.' % category_name
-
-### Items ####
-
-# Create new item
-@app.route('/catalog/<category_name>/items/new', methods=['GET','POST'])
-def newItem(category_name):
-	"""Creates a new item in the databse.
-	"""
 	# Get the category from the database by the category name.
 	category = session.query(Category).filter_by(name = category_name).one()
 
@@ -123,13 +111,72 @@ def newItem(category_name):
 	if 'username' not in login_session:
 		return redirect('/login')
 
-    # Check that the logged in user has authorization to create a new item in this category.
+    # Check that the logged in user has authorization to edit this category.
 	if category.user_id != login_session['user_id']:		
 		# Inform the user.		
-		flash('You are not authorized to modify this category. Please create your own category in order to modify.')
+		flash('You are not authorized to edit this category.')
 		# Refresh the page.
-		return redirect(url_for('index'))
+		return redirect(url_for('showCategory', category_name=category_name))
 
+	if request.method == 'POST':
+		if request.form['name']:
+			category.name = request.form['name']
+			session.add(category)
+			session.commit()			
+			flash("Changes saved for category %s." % category.name)
+			return redirect(url_for('showCategory', category_name=category.name))
+	else:
+		return render_template('editCategory', category=category)	
+
+# Delete Category
+@app.route('/catalog/<category_name>/delete', methods=['GET', 'POST'])
+def deleteCategory(category_name):
+	# Get the category from the database by the category name.
+	category = session.query(Category).filter_by(name = category_name).one()
+
+	# Check that a user is logged in.
+	if 'username' not in login_session:
+		return redirect('/login')
+
+    # Check that the logged in user has authorization to delete this category.
+	if category.user_id != login_session['user_id']:		
+		# Inform the user.		
+		flash('You are not authorized to delete this category.')
+		# Refresh the page.
+		return redirect(url_for('showCategory', category_name=category_name))
+
+	if request.method == 'POST':
+		# First, delete all of the items in the category.
+		items = session.query(Item).filter_by(category_id=category.id)
+		for item in items:
+			session.delete(item)
+			session.commit()
+
+		# Now, delete the category.
+		session.delete(category)
+		session.commit()
+		flash("Category Successfully Deleted")
+		return redirect(url_for('index'))
+	else:
+		return render_template('deleteCategory.html', category=category)
+
+
+### Items ####
+
+# Create new item
+@app.route('/catalog/<category_name>/items/new', methods=['GET','POST'])
+def newItem(category_name):
+	"""Creates a new item in the databse for the specified category.
+	A user must be logged in to add an item to a category, 
+	but they do not have to own the category.
+	"""
+	# Get the category from the database by the category name.
+	category = session.query(Category).filter_by(name = category_name).one()
+
+	# Check that a user is logged in.
+	if 'username' not in login_session:
+		return redirect('/login')
+    
 	if request.method == 'POST':
 		# Create the new item
 		
@@ -140,7 +187,7 @@ def newItem(category_name):
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 		
-		# Create a new item object.
+		# Create a new Item object.
 		newItem = Item(
 			user_id=login_session['user_id'],
 			name=request.form['name'], 
@@ -179,6 +226,7 @@ def editItem(category_name, item_name):
 	if 'username' not in login_session:
 		return redirect('/login')
 	
+	# Get the Category and Item to be edited.
 	category = session.query(Category).filter_by(name = category_name).one()
 	editedItem = session.query(Item).filter_by(category_id = category.id, name=item_name).one()
 
@@ -189,6 +237,7 @@ def editItem(category_name, item_name):
 		# Refresh the page.
 		return redirect(url_for('viewItem', category_name=category_name, item_name=editedItem.name))
 
+	# Handle the POST request
 	if request.method == 'POST':
 		if request.form['name']:
 			editedItem.name = request.form['name']		
@@ -355,10 +404,10 @@ def showLogin():
 	# creates an anti-forgery state token
 	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
 	login_session['state'] = state
-	print 'The current session state is %s' % login_session['state']
+	# print 'The current session state is %s' % login_session['state']
 	return render_template('login.html', STATE=state)
 
-# User methods...
+# User helper methods
 def createUser(login_session):
 	newUser = User(name=login_session['username'], email=login_session['email'], picture = login_session['picture'])
 	session.add(newUser)
@@ -377,6 +426,7 @@ def getUserID(email):
 	except:
 		return None  
 
+# User logout
 @app.route("/logout")
 def logout():
 	if 'provider' in login_session:
@@ -428,7 +478,7 @@ def gconnect():
 	url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
 	h = httplib2.Http()
 	result = json.loads(h.request(url, 'GET')[1])
-	print 'result: ', result
+	# print 'result: ', result
 	# If there was an error in the access token info, abort.
 	if result.get('error') is not None:
 		response = make_response(json.dumps(result.get('error')), 500)
@@ -473,7 +523,7 @@ def gconnect():
 	login_session['picture'] = data['picture']
 	login_session['email'] = data['email']	
 	login_session['provider'] = 'google'
-	print login_session
+	# print login_session
 
 	# See if user exists..
 	user_id = getUserID(login_session['email'])
@@ -491,32 +541,32 @@ def gconnect():
 	output += login_session['picture']
 	output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
 	flash("Now logged in as %s" % login_session['username'])
-	print "done!"
+	# print "done!"
 	return output		
 
 # Disconnect from Google - revokes the current user's token and resets their login_session
 @app.route("/gdisconnect")
 def gdisconnect():
 	# Disconnect connected user.  
-	print 'login_session:', login_session
+	# print 'login_session:', login_session
 	credentials = login_session['credentials']  
-	print 'User name is: ' 
-	print login_session['username']
+	# print 'User name is: ' 
+	# print login_session['username']
 
 	if credentials is None:
-		print 'Access Token is None'
+		# print 'Access Token is None'
 		response = make_response(json.dumps('Current user not connected.'), 401)
 		response.headers['Content-Type'] = 'application/json'
 		return response
 
 	# Execute HTTP GET request to revoke current token. 
 	access_token = credentials.access_token
-	print 'In gdisconnect access token is %s', access_token 
+	# print 'In gdisconnect access token is %s', access_token 
 	url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
 	h = httplib2.Http()
 	result = h.request(url, 'GET')[0]
-	print 'result is '
-	print result
+	# print 'result is '
+	# print result
 
 	if result['status'] != '200':			
 		response = make_response(json.dumps('Failed to revoke token for given user.', 400))
@@ -524,7 +574,7 @@ def gdisconnect():
 		return response
 
 
-# Run the server
+# Run the app
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True

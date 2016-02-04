@@ -3,9 +3,9 @@
 {% include "header.html" %}
 {% include 'flash.html' %}
 
-	<h1> Are you sure you want to delete {{item.name}}? </h1>
+	<h1> Are you sure you want to delete category {{category.name}}? </h1>
 
-	<form action='{{ url_for('deleteItem',category_name = category_name, item_name = item_name)}}' method = 'post'>
+	<form action='{{ url_for('deleteCategory', category_name = category.name)}}' method = 'post'>
 	<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 	<input type='submit', value = 'Delete'>
 
