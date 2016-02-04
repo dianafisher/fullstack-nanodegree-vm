@@ -85,25 +85,26 @@ def showCategory(category_name):
 
 # Create new category
 @app.route('/catalog/category/new', methods=['GET', 'POST'])
-def createCategory():
-	return 'Page to create a new category.'
+def newCategory():
+	if 'username' not in login_session:
+		return redirect('/login')
+	if request.method == 'POST':
+		category = Category(
+			user_id=login_session['user_id'],
+			name=request.form['name']
+		)
+		session.add(category)
+		flash("New Category Created")
+		return redirect(url_for('index'))
+	else:
+		return render_template('newCategory.html')
 
-# Edit Category (by id)
-@app.route('/catalog/<int:category_id>/edit', methods=['GET', 'POST'])
-def editCategory(category_id):
-	return 'Page to edit a category.'
-
-# Edit Category (by category name)
+# Edit Category
 @app.route('/catalog/<category_name>/edit', methods=['GET', 'POST'])
 def editCategory(category_name):
 	return 'Page to edit a category %s.' % category_name	
 
-# Delete Category (by id)
-@app.route('/catalog/<int:category_id>/delete', methods=['GET', 'POST'])
-def deleteCategory(category_id):
-	return 'Page to delete a category.'
-
-# Delete Category (by category name)
+# Delete Category
 @app.route('/catalog/<category_name>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_name):
 	return 'Page to delete category %s.' % category_name
@@ -115,6 +116,20 @@ def deleteCategory(category_name):
 def newItem(category_name):
 	"""Creates a new item in the databse.
 	"""
+	# Get the category from the database by the category name.
+	category = session.query(Category).filter_by(name = category_name).one()
+
+	# Check that a user is logged in.
+	if 'username' not in login_session:
+		return redirect('/login')
+
+    # Check that the logged in user has authorization to create a new item in this category.
+	if category.user_id != login_session['user_id']:		
+		# Inform the user.		
+		flash('You are not authorized to modify this category. Please create your own category in order to modify.')
+		# Refresh the page.
+		return redirect(url_for('index'))
+
 	if request.method == 'POST':
 		# Create the new item
 		
@@ -124,10 +139,10 @@ def newItem(category_name):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-		# Get the category from the database by the category name.
-		category = session.query(Category).filter_by(name = category_name).one()
+		
 		# Create a new item object.
 		newItem = Item(
+			user_id=login_session['user_id'],
 			name=request.form['name'], 
 			category=category,
 			description=request.form['description'],
@@ -160,8 +175,19 @@ def viewItem(category_name, item_name):
 # Update/Edit item
 @app.route('/catalog/<category_name>/<item_name>/edit', methods=['GET', 'POST'])
 def editItem(category_name, item_name):
+
+	if 'username' not in login_session:
+		return redirect('/login')
+	
 	category = session.query(Category).filter_by(name = category_name).one()
 	editedItem = session.query(Item).filter_by(category_id = category.id, name=item_name).one()
+
+	# Check that the logged in user has authorization to edit this item.
+	if editedItem.user_id != login_session['user_id']:
+		# Inform the user.		
+		flash('You are not authorized to modify this item. Please create your own item in order to modify.')
+		# Refresh the page.
+		return redirect(url_for('viewItem', category_name=category_name, item_name=editedItem.name))
 
 	if request.method == 'POST':
 		if request.form['name']:
@@ -188,8 +214,19 @@ def editItem(category_name, item_name):
 # Delete item
 @app.route('/catalog/<category_name>/<item_name>/delete', methods=['GET', 'POST'])
 def deleteItem(category_name, item_name):
+
+	if 'username' not in login_session:
+		return redirect('/login')
+
 	category = session.query(Category).filter_by(name = category_name).one()
 	itemToDelete = session.query(Item).filter_by(category_id = category.id, name=item_name).one()
+
+	# Check that the logged in user has authorization to edit this item.
+	if itemToDelete.user_id != login_session['user_id']:
+		# Inform the user.		
+		flash('You are not authorized to delete this item. Please create your own item in order to delete.')
+		# Refresh the page.
+		return redirect(url_for('viewItem', category_name=category_name, item_name=itemToDelete.name))
 
 	if request.method == 'POST':
 		session.delete(itemToDelete)

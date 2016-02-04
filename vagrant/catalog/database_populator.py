@@ -15,20 +15,20 @@ session = DBSession()
 user1 = User(
 	name="President Business",
 	email="business@octan.com",
-	picture='http://vignette2.wikia.nocookie.net/lego/images/2/25/President_Buisness.jpg/revision/latest?cb=20140114225837')
+	picture='http://fm.cnbc.com/applications/cnbc.com/resources/img/editorial/2014/02/20/101432762-Lego_WPS_1920_biz-1.530x298.jpg?v=1394539906')
 session.add(user1)
 session.commit()
 
 # Create categories
-series1 = Category(name="Series 1")
+series1 = Category(user_id=1, name="Series 1")
 session.add(series1)
 session.commit()
 
-series2 = Category(name="Series 2")
+series2 = Category(user_id=1, name="Series 2")
 session.add(series2)
 session.commit()
 
-series3 = Category(name="Series 3")
+series3 = Category(user_id=1, name="Series 3")
 session.add(series3)
 session.commit()
 

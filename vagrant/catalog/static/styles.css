@@ -3,119 +3,23 @@
 	font-weight: 700;
 }
 
-/* Creature ==================================================== */
-
-figure {
-  width: 200px;
-  height: 200px;
-  padding: 40px;
-  box-shadow: inset -10px -30px rgba(0,0,0,.06);
-  border-radius: 50%;
-  -webkit-animation: bobble 5s ease-in-out infinite;
-  animation: bobble 5s ease-in-out infinite;
-  -webkit-transform-origin: center bottom;
-  transform-origin: center bottom;
-  -webkit-transition: padding .3s, bottom .3s;
-  transition: padding .3s, bottom .3s;
-  text-align: center;
-  background: cadetblue;
+.creator {
+	padding-right: 20px;
+	margin-top: -20px;
+	text-align: right;
+	float:right;
 }
-
-@-webkit-keyframes bobble {
-  33% {
-    -webkit-transform: rotate(5deg);
-    transform: rotate(5deg);
-  }
-
-  66% {
-    -webkit-transform: rotate(-5deg);
-    transform: rotate(-5deg);
-  }
+.creator img {
+	width: 100px;
+	border-radius: 50%;
 }
-
-@keyframes bobble {
-  33% {
-    -webkit-transform: rotate(5deg);
-    transform: rotate(5deg);
-  }
-
-  66% {
-    -webkit-transform: rotate(-5deg);
-    transform: rotate(-5deg);
-  }
+.creator object {
+	width: 100px;
+	border-radius: 50%;
 }
-
-/* Eyes ======================================================== */
-
-.eye {
-  display: inline-block;
-  width: 10px;
-  height: 15px;
-  margin: 0 5px 5px;
-  background: rgba(0,0,0,.9);
-  border-radius: 10px;
-  border-radius: 50%;
-  -webkit-animation: blink 4s ease-in-out infinite;
-  animation: blink 4s ease-in-out infinite;
-}
-
-@-webkit-keyframes blink {
-  90% {
-    -webkit-transform: none;
-    transform: none;
-  }
-
-  95% {
-    -webkit-transform: rotateX(90deg);
-    transform: rotateX(90deg);
-  }
-}
-
-@keyframes blink {
-  90% {
-    -webkit-transform: none;
-    transform: none;
-  }
-
-  95% {
-    -webkit-transform: rotateX(90deg);
-    transform: rotateX(90deg);
-  }
-}
-
-/* Mouth =================================================== */
-
-.mouth {
-  display: block;
-  width: 100%;
-  height: 20px;
-  margin: 5px auto 0;
-  background: rgba(0,0,0,.9);
-  border-radius: 10px 10px 100px 100px;
-  border-radius: 10px 10px 50% 50%;
-  -webkit-transition: border-radius .5s, height .5s cubic-bezier(.15,.60,.30,1.9);
-  transition: border-radius .5s, height .5s cubic-bezier(.15,.60,.30,1.9);
-  overflow: hidden;
-  line-height: 0;
-  -webkit-transform-origin: center top;
-  transform-origin: center top;
-}
-
-.teeth:after,
-.teeth:before,
-.tooth:after {
-  display: inline-block;
-  content: "";
-  margin: 0 2px;
-  width: 15px;
-  height: 15px;
-  background: #eee;
-}
-
-li:nth-child(odd) .tooth:after {
-  margin-right: 17px;
-}
-
-li:nth-child(even) .tooth:after {
-  margin-left: 17px;
+.creator figcaption {
+	font-size: 14px;
+	color: #7B7573;
+	font-weight: 700;
+	margin-top: -20px;
 }

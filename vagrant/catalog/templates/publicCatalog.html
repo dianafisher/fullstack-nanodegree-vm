@@ -25,10 +25,23 @@
 		{% if items %}
 			{% for item in items %}
 			<div id='item'>		
-				<a href="{{ (url_for('viewItem', category_name=item.category.name, item_name=item.name)) }}">{{ item.name }} ({{ item.category.name }})</a>	
-			</div>
+			<a href="{{ (url_for('viewItem', category_name=item.category.name, item_name=item.name)) }}">{{ item.name }}</a>	
+			<figure class="item">
+				<img src="{{ url_for('uploaded_file', filename=item.imageFilename )}}" alt="Item image" width="261" height="300">
+				<figcaption>{{ item.category.name }}</figcaption>
+			</figure>
+		</div>
+		<figure class="creator">
+			<img src="{{ item.user.picture}}">
+			<figcaption>Created by {{ item.user.name }}</figcaption>
+		</figure>	
 			{% endfor %}
 		{% endif %}
 		</div>
 	</div>
+	<a href='{{ url_for('catalogJSON') }}'>
+	<button class="btn btn-default" id="new-restaurant">
+		<span class="glyphicon glyphicon-save" aria-hidden="true"></span> JSON 
+	</button>
+	</a>
 {% endblock %}
