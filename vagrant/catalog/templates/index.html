@@ -1,22 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>LEGO Minifigures</title>				
-		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+		<title>LEGO Minifigures</title>						
+		<!-- Bootstrap -->
 		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap.min.css') }}">
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+		
 		<link href="{{ url_for('recent_feed') }}"
       rel="alternate"
       title="Recent Items" 
       type="application/atom+xml">
+      
       <link rel="shortcut icon" href='{{ url_for('static', filename='favicon.png') }}' />
-      <script src="/static/js/moment.min.js"></script>
-      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-      <!-- Latest compiled and minified JavaScript for Bootstrap-->
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>      
+
 	</head>
-	<body>					
+	<body>
+	 	<script src="/static/js/moment.min.js"></script>
+      	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+      	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      	<!-- Latest compiled and minified JavaScript for Bootstrap-->
+      	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>      					
+		
+		{% include "header.html" %}
 		<div class="container">
+			<!-- Header ================================================== -->
+
+			<div class="page-header" id="banner">
+				<div class="col-lg-8 col-md-7 col-sm-6">
+					<h1>LEGO Minifigures</h1>
+					<p class="lead">Show off your collection!</p>
+				</div>
+			</div>
+
 			{% block content %}
 			{% endblock %}
 		</div>		

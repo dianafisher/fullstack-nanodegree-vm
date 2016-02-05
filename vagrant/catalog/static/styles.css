@@ -8,6 +8,10 @@ body {
   	padding-bottom: 20px;
 }
 
+.page-header {
+	margin: 10px 0 21px;
+}
+
 .navbar {
   	margin-bottom: 20px;
 
@@ -15,6 +19,7 @@ body {
 
 .img-user {
 	margin: 2px;
+	margin-right: 15px;
 }
 
 .creator {
