@@ -1,4 +1,4 @@
-<nav class="navbar navbar-inverse">
+<nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -13,10 +13,11 @@
 			<ul class="nav navbar-nav navbar-right">
 				{%if 'username' not in session %}
 				<li><a href="{{url_for('showLogin')}}">Click Here to Login </a></li>
-			{% else %}			
+			{% else %}							
 				<li><a href="{{url_for('logout')}}">Logout </a></li>
+				<li><img class="img-circle img-responsive img-center img-user" src='{{ session['picture'] }}' alt="User Image" width="40px" height="40px"></li>
 			{% endif %}
 			</ul>
-		</div>
+		</div>		
 	</div>
 </nav>

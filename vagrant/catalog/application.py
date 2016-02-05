@@ -118,12 +118,20 @@ def editCategory(category_name):
 		return redirect(url_for('showCategory', category_name=category_name))
 
 	if request.method == 'POST':
-		if request.form['name']:
-			category.name = request.form['name']
-			session.add(category)
-			session.commit()			
-			flash("Changes saved for category %s." % category.name)
-			return redirect(url_for('showCategory', category_name=category.name))
+		# Check which button was pressed, Cancel or Submit
+		print request.form
+
+		if request.form['reset']:
+			# Return to the main page
+			return redirect(url_for('index'))
+
+		if request.form['submit']:
+			if request.form['name']:
+				category.name = request.form['name']
+				session.add(category)
+				session.commit()			
+				flash("Changes saved for category %s." % category.name)
+				return redirect(url_for('showCategory', category_name=category.name))
 	else:
 		return render_template('editCategory', category=category)	
 
@@ -423,7 +431,11 @@ def getUserID(email):
 		user = session.query(User).filter_by(email = email).one()
 		return user.id
 	except:
-		return None  
+		return None
+
+@app.route("/userPicture")
+def userPicture():
+	return login_session['picture']
 
 # User logout
 @app.route("/logout")
