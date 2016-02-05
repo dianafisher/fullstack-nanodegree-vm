@@ -73,15 +73,14 @@ def index():
 	# check if user is logged in
 	if 'username' not in login_session:
 		return render_template('publicCatalog.html', categories=categories, items=items)
-	else:
-		print 'showing catalog.html'
+	else:		
 		return render_template('catalog.html', categories=categories, items=items)	
 
 # Show items in a category (by category name)
 @app.route('/catalog/<category_name>')
 def showCategory(category_name):
 	category = session.query(Category).filter_by(name = category_name).one()
-	items = session.query(Item).filter_by(category_id = category.id)	
+	items = session.query(Item).filter_by(category_id = category.id)
 	
 	return render_template('category.html', category=category, items=items)	
 
