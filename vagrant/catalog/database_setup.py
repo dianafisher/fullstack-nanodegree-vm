@@ -41,10 +41,10 @@ class Item(Base):
 	__tablename__ = 'item'
 
 	id = Column(Integer, primary_key=True)
-	name = Column(String(250), nullable=False)
+	name = Column(String(100), nullable=False)
 	dateAdded = Column(DateTime)
 	lastUpdated = Column(DateTime)
-	description = Column(String(250))
+	description = Column(String(1000))
 	imageFilename = Column(String(250))
 	user_id = Column(Integer, ForeignKey('user.id'))
 	user = relationship(User)
