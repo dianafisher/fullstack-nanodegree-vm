@@ -240,7 +240,7 @@ def editItem(category_name, item_name):
 	# Check that the logged in user has authorization to edit this item.
 	if editedItem.user_id != login_session['user_id']:
 		# Inform the user.		
-		flash('You are not authorized to modify this item. Please create your own item in order to modify.')
+		flash('You are not authorized to modify this item. Please create your own item in order to modify.', 'error')
 		# Refresh the page.
 		return redirect(url_for('viewItem', category_name=category_name, item_name=editedItem.name))
 
@@ -280,7 +280,7 @@ def deleteItem(category_name, item_name):
 	# Check that the logged in user has authorization to edit this item.
 	if itemToDelete.user_id != login_session['user_id']:
 		# Inform the user.		
-		flash('You are not authorized to delete this item. Please create your own item in order to delete.')
+		flash('You are not authorized to delete this item. Please create your own item in order to delete.', 'error')
 		# Refresh the page.
 		return redirect(url_for('viewItem', category_name=category_name, item_name=itemToDelete.name))
 
