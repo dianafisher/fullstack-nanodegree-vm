@@ -2,6 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+
  
 Base = declarative_base()
 
@@ -14,10 +15,6 @@ class User(Base):
 	email = Column(String(250), nullable=False)
 	picture = Column(String(250))
 	last_seen = Column(DateTime)
-
-	@property
-	def is_authenticated(self):
-	    return True
 	
 
 class Category(Base):
@@ -59,8 +56,8 @@ class Item(Base):
 		return {
 			'name'	: self.name,
 			'id'	: self.id,
-			'dateAdded'	: self.dateAdded,
-			'lastUpdated' : self.lastUpdated,
+			'dateAdded'	: self.dateAdded.isoformat(),
+			'lastUpdated' : self.lastUpdated.isoformat(),
 			'description'	: self.description,
 			'imageFilename'	: self.imageFilename
 		}

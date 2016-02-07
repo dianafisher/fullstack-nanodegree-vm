@@ -342,17 +342,23 @@ def uploaded_file(filename):
 
 ### JSON API endpoints ###
 
-# Get entire catalog
-@app.route('/catalog.json')
-def catalogJSON():
+# Get all categories
+@app.route('/categories.json')
+def getCategoriesJSON():
 	# get the categories from the database.
 	categories = session.query(Category).order_by(asc(Category.name))
 
-	return {}
+	return jsonify(Cateogry=[c.serialize for c in categories])
 
-# Get a category
-@app.route('/catalog/<int:category_id>/JSON')
-def categoryJSON(category_id):
+@app.route('/catalog/<category_name>/items.json')
+def getItemsJSON(category_name):
+	category = session.query(Category).filter_by(name = category_name).one()
+	items = session.query(Item).filter_by(category_id = category.id)
+	return jsonify(Item=[i.serialize for i in items])
+
+### RSS feed endpoint ###
+@app.route('/catalog/RSS')
+def rss_feed():
 	return {}
 
 # Get an item
