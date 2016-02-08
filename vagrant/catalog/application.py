@@ -118,20 +118,14 @@ def editCategory(category_name):
 		return redirect(url_for('showCategory', category_name=category_name))
 
 	if request.method == 'POST':
-		# Check which button was pressed, Cancel or Submit
-		print request.form
-
-		if request.form['reset']:
-			# Return to the main page
-			return redirect(url_for('index'))
-
-		if request.form['submit']:
-			if request.form['name']:
-				category.name = request.form['name']
-				session.add(category)
-				session.commit()			
-				flash("Changes saved for category %s." % category.name)
-				return redirect(url_for('showCategory', category_name=category.name))
+		# Check which button was pressed, Cancel or Submit		
+		
+		if request.form['name']:
+			category.name = request.form['name']
+			session.add(category)
+			session.commit()			
+			flash("Changes saved for category %s." % category.name)
+			return redirect(url_for('showCategory', category_name=category.name))
 	else:
 		return render_template('editCategory.html', category=category)	
 
@@ -224,7 +218,9 @@ def viewItem(category_name, item_name):
 	category = session.query(Category).filter_by(name = category_name).one()
 	item = session.query(Item).filter_by(category_id = category.id, name=item_name).one()	
 	updated = momentjs.Momentjs(item.lastUpdated).fromNow()
-	return render_template('item.html', item=item, updated=updated)	
+	user = session.query(User).filter_by(id=item.user_id).one()
+
+	return render_template('item.html', item=item, updated=updated, user=user)	
 
 # Update/Edit item
 @app.route('/catalog/<category_name>/<item_name>/edit', methods=['GET', 'POST'])
@@ -480,7 +476,7 @@ def addToUserCollection(category_name, item_name):
 		flash("%s added to your collection." % item_name)		
 		return redirect(url_for('showCategory', category_name=category_name))
 	else:
-		flash("You already have this item in your collection.", 'error')
+		flash("%s is already in your collection." % item.name, 'error')
 		return redirect(url_for('showCategory', category_name=category_name))
 
 @app.route('/catalog/myItems')
