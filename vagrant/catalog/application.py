@@ -67,8 +67,8 @@ def index():
 	# get the categories from the database.
 	categories = session.query(Category).order_by(asc(Category.name))
 
-	# get the latest added items.
-	items = session.query(Item).order_by(desc(Item.dateAdded))	
+	# Get the latest added items.  Limit to 15 items.	
+	items = session.query(Item).order_by(desc(Item.dateAdded)).limit(15).all()	
 
 	# check if user is logged in
 	if 'username' not in login_session:
@@ -133,7 +133,7 @@ def editCategory(category_name):
 				flash("Changes saved for category %s." % category.name)
 				return redirect(url_for('showCategory', category_name=category.name))
 	else:
-		return render_template('editCategory', category=category)	
+		return render_template('editCategory.html', category=category)	
 
 # Delete Category
 @app.route('/catalog/<category_name>/delete', methods=['GET', 'POST'])

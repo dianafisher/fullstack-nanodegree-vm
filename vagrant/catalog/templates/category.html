@@ -9,12 +9,21 @@
 	</div>
 	<div class="row">
 		<div class="col-lg-12">
-		<a href='{{ url_for('editCategory', category_name=category.name) }}' class="btn btn-default" role="button">Edit</a>
-		<a href='{{ url_for('deleteCategory', category_name=category.name) }}' class="btn btn-default" role="button">Delete</a>
-		<a href='{{ url_for('newItem', category_name=category.name) }}' class="btn btn-default" role="button">Add New Item</a>		
+			
+				<p>
+					<a href='{{ url_for('editCategory', category_name=category.name) }}' class="btn btn-default" role="button">Edit Category</a>
+					<a href='{{ url_for('deleteCategory', category_name=category.name) }}' class="btn btn-default" role="button">Delete Category</a>
+					<a href='{{ url_for('newItem', category_name=category.name) }}' class="btn btn-default" role="button">Add New Item</a>		
+				</p>
+
+		</div>
 	</div>
 	{% endif %}
-	
+	<div class="row">
+		<div class="col-lg-12">
+			<h2>Items</h2>
+		</div>
+	</div>
 	{% if items %}		
 		<div class="row">
 		{% for item in items %}
@@ -23,8 +32,11 @@
 					<img src="{{ url_for('uploaded_file', filename=item.imageFilename )}}" alt="Item image" width="261" height="300">
 					<div class="caption">
 						<h3>{{ item.name}} </h3>							
-						<p><a href='{{ (url_for('viewItem', category_name=item.category.name, item_name=item.name)) }}' class="btn btn-primary" role="button">View</a>
-						<a href='{{ (url_for('deleteItem', category_name=item.category.name, item_name=item.name)) }}' class="btn btn-primary" role="button">Delete</a></p>
+						<p>
+						<a href='{{ (url_for('viewItem', category_name=item.category.name, item_name=item.name)) }}' class="btn btn-primary" role="button">View</a>
+						<a href='{{ (url_for('deleteItem', category_name=item.category.name, item_name=item.name)) }}' class="btn btn-primary" role="button">Delete</a>
+						<a href='{{ (url_for('deleteItem', category_name=item.category.name, item_name=item.name)) }}' class="btn btn-success" role="button">I Have This!</a>
+						</p>
 					</div>
 				</div>											
 			</div>			

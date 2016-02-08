@@ -1,15 +1,35 @@
 {% extends "index.html" %}
 {% block content %}
-{% include "header.html" %}
 {% include 'flash.html' %}
 
-	<h1> Are you sure you want to delete {{item.name}}? </h1>
+<div class="bs-docs-section">
+	<div class="row">
+		<div class="col-lg-12">
+			<!-- <div class="page-header"> -->
+			<h1> Are you sure you want to delete {{item.name}}? </h1>
+			<!-- </div> -->
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-12">
+		<div class="well bs-component">		
+			<form class="form-horizontal" action='{{ url_for('deleteItem',category_name = category_name, item_name = item_name)}}' method = 'POST'>
+				<fieldset>					
+					<div class="form-group">																	
+					</div>
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">											
+					<div class="form-group">
+						<div class="col-lg-10">							
+							<button type="submit" class="btn btn-warning" id="submit">Delete</button>							
+							<a class="btn btn-primary" href = '{{ url_for('showCategory', category_name = category_name)}}'>Cancel</a>						
+						</div> 	
+					</div>				
+				</fieldset>
+			</form>											
+		</div>
+	</div>
+</div>	
 
-	<form action='{{ url_for('deleteItem',category_name = category_name, item_name = item_name)}}' method = 'post'>
-	<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-	<input type='submit', value = 'Delete'>
-
-	</form>	
-				
-	<a href = '{{ url_for('showCategory', category_name = category_name)}}'> Cancel </a>
+	
 {% endblock %}
