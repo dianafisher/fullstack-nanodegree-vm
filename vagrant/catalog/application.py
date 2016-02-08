@@ -113,7 +113,7 @@ def editCategory(category_name):
     # Check that the logged in user has authorization to edit this category.
 	if category.user_id != login_session['user_id']:		
 		# Inform the user.		
-		flash('You are not authorized to edit this category.')
+		flash('You are not authorized to edit this category.', 'error')
 		# Refresh the page.
 		return redirect(url_for('showCategory', category_name=category_name))
 
@@ -148,7 +148,7 @@ def deleteCategory(category_name):
     # Check that the logged in user has authorization to delete this category.
 	if category.user_id != login_session['user_id']:		
 		# Inform the user.		
-		flash('You are not authorized to delete this category.')
+		flash('You are not authorized to delete this category.', 'error')
 		# Refresh the page.
 		return redirect(url_for('showCategory', category_name=category_name))
 
@@ -309,7 +309,7 @@ def upload_file():
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			print url_for('uploaded_file',filename=filename)
+			# print url_for('uploaded_file',filename=filename)
 			return redirect(url_for('uploaded_file',
                                     filename=filename))
 	else:
@@ -319,52 +319,47 @@ def upload_file():
 def uploaded_file(filename):
 	return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
 
-
-# photos = UploadSet('photos', IMAGES)
-
-# @app.route('/upload', methods=['GET', 'POST'])
-# def upload():
-# 	if request.method == 'POST' and 'photo' in request.files:
-# 		filename = photos.save(request.files['photo'])
-# 		rec = Photo(filename=filename, user=g.user.id)
-# 		rec.store()
-# 		flash("Photo saved.")
-# 		return redirect(url_for('show', id=rec.id))
-# 	return render_template('upload.html')
-
-# @app.route('/photo/<id>')
-# def show(id):
-# 	photo = Photo.load(id)
-# 	if photo is None:
-# 		abort(404)
-# 	url = photos.url(photo.filename)
-# 	return render_template('show.html', url=url, photo=photo)
-
 ### JSON API endpoints ###
 
-# Get all categories
-@app.route('/categories.json')
-def getCategoriesJSON():
+# JSON for entire catalog
+@app.route('/catalog/JSON')
+def catalogJSON():
 	# get the categories from the database.
 	categories = session.query(Category).order_by(asc(Category.name))
+	cats = [c.serialize for c in categories]
+	
+	# get the items for each category.
+	for category in cats:	
+		items = session.query(Item).filter_by(category_id = category['id'])
+		category['items'] = [i.serialize for i in items]		
 
-	return jsonify(Cateogry=[c.serialize for c in categories])
+	return jsonify(Cateogries=cats)
 
-@app.route('/catalog/<category_name>/items.json')
-def getItemsJSON(category_name):
+# JSON for a specific category
+@app.route('/catalog/<category_name>/items/JSON')
+def categoryNameItemsJSON(category_name):
 	category = session.query(Category).filter_by(name = category_name).one()
 	items = session.query(Item).filter_by(category_id = category.id)
 	return jsonify(Item=[i.serialize for i in items])
 
-### RSS feed endpoint ###
-@app.route('/catalog/RSS')
-def rss_feed():
-	return {}
+# JSON for a specific category (by id)
+@app.route('/catalog/<int:category_id>/items/JSON')
+def categoryItemsJSON(category_id):		
+	items = session.query(Item).filter_by(category_id = category_id)
+	return jsonify(Item=[i.serialize for i in items])	
 
-# Get an item
-@app.route('/catalog/<int:item_id>/JSON')
-def itemJSON(item_id):
-	return {}
+# JSON for a specific item in a category
+@app.route('/catalog/<category_name>/<item_name>/JSON')
+def itemByNameJSON(category_name, item_name):
+	category = session.query(Category).filter_by(name = category_name).one()
+	item = session.query(Item).filter_by(category_id = category.id, name=item_name).one()
+	return jsonify(Item=item.serialize)
+
+# JSON for a specific item in a category (by id)
+@app.route('/catalog/<int:category_id>/<int:item_id>/JSON')
+def itemJSON(category_id, item_id):	
+	item = session.query(Item).filter_by(category_id = category_id, id=item_id).one()
+	return jsonify(Item=item.serialize)	
 
 ### ATOM feed endpoint ###
 @app.route('/catalog/recent.atom')
@@ -375,20 +370,19 @@ def recent_feed():
 		subtitle="Most recent items.")
 
 	items = session.query(Item).order_by(asc(Item.dateAdded))
-	print 
+	
 	for item in items:
-		print item.category.name	
+		
 		categories = []	
-		cat = {'term' : 'sports', 'label': 'none'}				
+		cat = {'term' : item.category.name, 'label': 'none'}				
 		categories.append(cat)
-		print categories
-		author = {'name': 'unknown', 'email': 'unknown@gmail.com'}
+		
+		author = {'name': item.user.name, 'email': item.user.email}
 
 		entry = FeedEntry(item.name, item.description,
 			content_type='html',
-			author=author,
-			# links=[{'href' : 'none'}],
-			categories=[{'term' : 'sports'}],
+			author=author,			
+			categories=categories,
 			added=item.dateAdded,
 			id=request.url_root + 'catalog/items/' + str(item.id),
 			published=item.dateAdded,
@@ -396,16 +390,7 @@ def recent_feed():
 
 		# print entry.to_string()
 
-		feed.add(entry)
-		# feed.add(item.name, unicode(item.description),
-		# 	content_type='html',
-		# 	author=author,
-		# 	categories=[item.category.name],
-		# 	added=item.dateAdded,
-		# 	id=request.url_root + 'catalog/items/' + str(item.id),
-		# 	published=item.dateAdded,
-		# 	updated=item.lastUpdated
-		# 	)
+		feed.add(entry)		
 
 	return feed.get_response()
 
