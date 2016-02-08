@@ -18,26 +18,105 @@
 				{% endif %}
 			{% endwith %}
 		</div>
+
+	{% if items !=[] %}
+
 		<a href = '{{url_for('newMenuItem', restaurant_id = restaurant.id) }}'>Create New Item</a>
-		</br>
-		</br>
+		</br></br>
+
+		<h2>Appetizers</h2>
 
 		{% for i in items %}
-	<div class = 'nameAndPrice'>
-		<span class = 'name'><p>{{i.name}}</p></span>
-		<span class = 'price'><p>{{i.price}}</p></span>
-	</div>
-	<div class = 'description'>
-		<p>{{i.description}}</p>
-	</div>
-	<div class = 'editdeletepane'>
-	<!-- Use URL building to generate edit and delete links -->
+		{% if i.course == 'Appetizer' %}
+
+		<div class = 'nameAndPrice'>
+			<span class = 'name'><p>{{i.name}}</p></span>
+			<span class = 'price'><p>{{i.price}}</p></span>
+		</div>
+		<div class = 'description'>
+			<p>{{i.description}}</p>
+		</div>
+		<div class = 'editdeletepane'>
+		<!-- Use URL building to generate edit and delete links -->
 		<a href='{{url_for('editMenuItem', restaurant_id=restaurant.id, menu_id=i.id)}}'>Edit</a>
 	
 		<a href='{{url_for('deleteMenuItem', restaurant_id=restaurant.id, menu_id=i.id)}}'>Delete</a>
-	</div>
-		{% endfor %}	
-	</div>
+		</div>
+
+		{% endif %}
+		{% endfor %}
+		
+		</br></br>
+		<h2>Entrees</h2>
+
+		{% for i in items %}
+		{% if i.course == 'Entree' %}
+
+		<div class = 'nameAndPrice'>
+			<span class = 'name'><p>{{i.name}}</p></span>
+			<span class = 'price'><p>{{i.price}}</p></span>
+		</div>
+		<div class = 'description'>
+			<p>{{i.description}}</p>
+		</div>
+		<div class = 'editdeletepane'>
+		<!-- Use URL building to generate edit and delete links -->
+		<a href='{{url_for('editMenuItem', restaurant_id=restaurant.id, menu_id=i.id)}}'>Edit</a>
+	
+		<a href='{{url_for('deleteMenuItem', restaurant_id=restaurant.id, menu_id=i.id)}}'>Delete</a>
+		</div>
+		{% endif %}
+		{% endfor %}
+		
+		</br></br>
+		<h2>Deserts</h2>
+
+		{% for i in items %}
+		{% if i.course == 'Deserts' %}
+
+		<div class = 'nameAndPrice'>
+			<span class = 'name'><p>{{i.name}}</p></span>
+			<span class = 'price'><p>{{i.price}}</p></span>
+		</div>
+		<div class = 'description'>
+			<p>{{i.description}}</p>
+		</div>
+		<div class = 'editdeletepane'>
+		<!-- Use URL building to generate edit and delete links -->
+		<a href='{{url_for('editMenuItem', restaurant_id=restaurant.id, menu_id=i.id)}}'>Edit</a>
+	
+		<a href='{{url_for('deleteMenuItem', restaurant_id=restaurant.id, menu_id=i.id)}}'>Delete</a>
+		</div>
+		{% endif %}
+		{% endfor %}
+
+		</br></br>
+		<h2>Beverages</h2>
+
+		{% for i in items %}
+		{% if i.course == 'Beverages' %}
+
+		<div class = 'nameAndPrice'>
+			<span class = 'name'><p>{{i.name}}</p></span>
+			<span class = 'price'><p>{{i.price}}</p></span>
+		</div>
+		<div class = 'description'>
+			<p>{{i.description}}</p>
+		</div>
+		<div class = 'editdeletepane'>
+		<!-- Use URL building to generate edit and delete links -->
+		<a href='{{url_for('editMenuItem', restaurant_id=restaurant.id, menu_id=i.id)}}'>Edit</a>
+	
+		<a href='{{url_for('deleteMenuItem', restaurant_id=restaurant.id, menu_id=i.id)}}'>Delete</a>
+		</div>		
+		{% endif %}
+		{% endfor %}
+
+	{% else %}
+	<p> You currently have no menu items. <p>
+		<a href = "{{url_for('newMenuItem', restaurant_id = restaurant.id )}}">Create New Item</a>
+	{% endif %}
+	
 	</div>		
 	</body>
 </html>	

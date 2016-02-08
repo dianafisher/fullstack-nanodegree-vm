@@ -42,7 +42,7 @@ def newRestaurant():
 		restauraunt = Restaurant(name = request.form['name'])		
 		session.add(restauraunt)
 		session.commit()
-		# flash("new restaurant created!")
+		flash("New Restaurant Created!")
 
 		# Redirect back to the main page
 		return redirect(url_for('listRestaurants'))
@@ -61,7 +61,7 @@ def editRestaurant(restaurant_id):
 			editedRestaurant.name = request.form['name']
 			session.add(editedRestaurant)
 			session.commit()
-			# flash("Restaurant edited!")
+			flash("Restaurant Successfully Edited!")
 		return redirect(url_for('listRestaurants'))
 	else:	
 		# Handle GET request	
@@ -74,7 +74,7 @@ def deleteRestaurant(restaurant_id):
 	if request.method == 'POST':
 		session.delete(restaurantToDelete)
 		session.commit()
-		# flash("Restaurant deleted!")
+		flash("Restaurant Successfully Deleted!")
 		return redirect(url_for('listRestaurants'))
 	else:
 		return render_template('deleterestaurant.html', restaurant_id = restaurant_id, restaurant = restaurantToDelete)	
@@ -85,6 +85,8 @@ def deleteRestaurant(restaurant_id):
 def showMenu(restaurant_id):
 	restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
 	items = session.query(MenuItem).filter_by(restaurant_id = restaurant_id)
+	for item in items:
+		print item.name, item.id, item.course, item.description, item.price	
 	return render_template('menu.html', restaurant=restaurant, items = items)	
 
 # Create a new menu item
@@ -95,6 +97,7 @@ def newMenuItem(restaurant_id):
                            'description'], price=request.form['price'], course=request.form['course'], restaurant_id=restaurant_id)
 		session.add(newItem)
 		session.commit()
+		flash("Menu Item Created")
 		return redirect(url_for('showMenu', restaurant_id=restaurant_id))
 	else:
 		return render_template('newmenuitem.html', restaurant_id=restaurant_id)
@@ -108,7 +111,7 @@ def editMenuItem(restaurant_id, menu_id):
 			editedItem.name = request.form['name']
 		session.add(editedItem)
 		session.commit()
-		# flash("Menu item edited!")
+		flash("Menu Item Successfully Edited!")
 		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 	else:		
 		return render_template('editmenuitem.html', restaurant_id = restaurant_id, menu_id = menu_id, item = editedItem)
@@ -121,7 +124,7 @@ def deleteMenuItem(restaurant_id, menu_id):
 	if request.method == 'POST':
 		session.delete(itemToDelete)
 		session.commit()
-		# flash("Menu item deleted!")
+		flash("Menu Item Successfully Deleted!")
 		return redirect(url_for('showMenu', restaurant_id = restaurant_id))
 	else:
 		return render_template('deletemenuitem.html', restaurant_id = restaurant_id, menu_id = menu_id, item = itemToDelete)
@@ -149,5 +152,6 @@ def restaurantMenuItemJSON(restaurant_id, menu_id):
 	return jsonify(MenuItem=item.serialize)    
 
 if __name__ == '__main__':
+	app.secret_key = 'key_to_my_app'
 	app.debug = True
 	app.run(host = '0.0.0.0', port = 5000)

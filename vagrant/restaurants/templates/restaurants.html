@@ -19,5 +19,16 @@
 		<a href='{{url_for('deleteRestaurant', restaurant_id=r.id)}}'>Delete</a>
 			{% endfor %}
 		{% endif %}
+
+		<!-- MESSAGE FLASHING -->
+			{% with messages = get_flashed_messages() %}
+				{% if messages %}
+				<ul>
+					{% for message in messages %}
+						<li><strong> {{message}} </strong></li>
+					{% endfor %}
+				</ul>
+				{% endif %}
+			{% endwith %}
 	</body>
 </html>
