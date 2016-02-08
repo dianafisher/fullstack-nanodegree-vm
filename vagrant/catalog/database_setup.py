@@ -14,8 +14,7 @@ class User(Base):
 	name = Column(String(250), nullable=False)
 	email = Column(String(250), nullable=False)
 	picture = Column(String(250))
-	last_seen = Column(DateTime)
-	
+	last_seen = Column(DateTime)	
 
 class Category(Base):
 	__tablename__ = 'category'
@@ -43,10 +42,12 @@ class Item(Base):
 	lastUpdated = Column(DateTime)
 	description = Column(String(1000))
 	imageFilename = Column(String(250))
+
+	# Create a foreign key with the User table to store which user created this item.
 	user_id = Column(Integer, ForeignKey('user.id'))
 	user = relationship(User)
 	
-	# make a foreign key reference to the Category in which this item resides
+	# Create a foreign key reference to the Category in which this item resides
 	category_id = Column(Integer, ForeignKey('category.id'))
 	category = relationship(Category)
 
@@ -61,6 +62,18 @@ class Item(Base):
 			'description'	: self.description,
 			'imageFilename'	: self.imageFilename
 		}
+
+'''Create a mapping between users and items.  This is used to store what items each user has.'''
+class UserItem(Base):
+	__tablename__ = 'useritems'
+
+
+	user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+	user = relationship(User)
+
+	item_id = Column(Integer, ForeignKey('item.id'), primary_key=True)
+	item = relationship(Item)
+
 
 engine = create_engine('sqlite:///minifigures.db')
  

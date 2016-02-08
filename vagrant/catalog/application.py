@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, jsonify, url_for, f
 
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Category, Item, User
+from database_setup import Base, Category, Item, User, UserItem
 
 # for generation of unique session token...
 from flask import session as login_session
@@ -282,7 +282,9 @@ def deleteItem(category_name, item_name):
 		# Inform the user.		
 		flash('You are not authorized to delete this item. Please create your own item in order to delete.', 'error')
 		# Refresh the page.
-		return redirect(url_for('viewItem', category_name=category_name, item_name=itemToDelete.name))
+		return redirect(url_for('viewItem', 
+			category_name=category_name, 
+			item_name=itemToDelete.name))
 
 	if request.method == 'POST':
 		session.delete(itemToDelete)
@@ -290,7 +292,10 @@ def deleteItem(category_name, item_name):
 		flash("Item deleted!")
 		return redirect(url_for('showCategory', category_name = category_name))
 	else:
-		return render_template('deleteItem.html', category_name = category_name, item_name = item_name, item = itemToDelete)	
+		return render_template('deleteItem.html', 
+			category_name = category_name, 
+			item_name = item_name, 
+			item = itemToDelete)	
 
 ### File Uploads ###
 
@@ -446,6 +451,53 @@ def logout():
 	else:
 		flash("Not logged in.");
 		return redirect(url_for('index'))
+
+### Methods to handle users adding items to their 'collection'.
+@app.route('/catalog/<category_name>/<item_name>/add')		
+def addToUserCollection(category_name, item_name):
+
+	# Check that a user is logged in.
+	if 'username' not in login_session:
+		return redirect('/login')
+        
+	category = session.query(Category).filter_by(name = category_name).one()
+	item = session.query(Item).filter_by(category_id = category.id, name=item_name).one()
+	
+	# Get the id of the current logged in user.
+	user_id = login_session['user_id']
+		
+	# Check to see if this user has already added this item to their collection.
+	userItem = session.query(UserItem).filter_by(user_id=user_id, item_id=item.id).first()
+
+	if userItem is None:
+		# Add the new mapping to the databse.
+		userItem = UserItem(
+			user_id = login_session['user_id'],
+			item_id = item.id
+		)
+		session.add(userItem)
+		session.commit()
+		flash("%s added to your collection." % item_name)		
+		return redirect(url_for('showCategory', category_name=category_name))
+	else:
+		flash("You already have this item in your collection.", 'error')
+		return redirect(url_for('showCategory', category_name=category_name))
+
+@app.route('/catalog/myItems')
+def userCollection():
+	# Check that a user is logged in.
+	if 'username' not in login_session:
+		return redirect('/login')
+
+	# Get the id of the current logged in user.
+	user_id = login_session['user_id']		
+	
+	# Query the database with a join to get the user's items.
+	items = session.query(Item).join(UserItem).filter(UserItem.item_id == Item.id).all()
+	for i in items:
+		print i
+	
+	return render_template('userItems.html', items=items)
 
 ### Google Authentication ###
 @csrf.exempt
