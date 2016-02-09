@@ -1,6 +1,10 @@
 # LEGO Minifigures Catalog
 
-A catalog web application written in Python and Flask.  Users can create categories and add minifigures to any category which they have created.  A "My Collection" section is available for users to indicate they own (physical versions of) minigures listed in the app.
+A catalog web application written in Python and Flask.  Users can create categories (e.g. 'Series 1', 'Star Wars', etc.) and add minifigures to any category (even if they did not create that category).  However, only the creator of a category can modify it's name or delete the category.
+
+Additionally, users may only modify or delete minifigures which they have created.
+
+A "My Collection" section is available for users to indicate they own (physical versions of) minigures listed in the app.  A user can add any item to their collection even if they did not create the item.
 
 OAuth2 user authentication is supported via Google sign in.
 
