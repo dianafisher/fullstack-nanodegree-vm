@@ -76,7 +76,6 @@ def internal_error(error):
     return render_template('500.html'), 500
 
 
-
 '''Routes'''
 
 
@@ -103,7 +102,7 @@ def index():
 @app.route('/catalog/<category_name>')
 def showCategory(category_name):
     category = session.query(Category).filter_by(name=category_name).first()
-    if category is None:        
+    if category is None:
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
@@ -132,7 +131,7 @@ def newCategory():
 def editCategory(category_name):
     # Get the category from the database by the category name.
     category = session.query(Category).filter_by(name=category_name).first()
-    if category is None:        
+    if category is None:
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
@@ -168,7 +167,7 @@ def deleteCategory(category_name):
     # Get the category from the database by the category name.
     category = session.query(Category).filter_by(name=category_name).first()
 
-    if category is None:        
+    if category is None:
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
@@ -213,7 +212,7 @@ def newItem(category_name):
     # Get the category from the database by the category name.
     category = session.query(Category).filter_by(name=category_name).first()
 
-    if category is None:        
+    if category is None:
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
@@ -258,7 +257,7 @@ def viewItem(category_name, item_name):
     """Renders view to display item information."""
 
     category = session.query(Category).filter_by(name=category_name).first()
-    if category is None:        
+    if category is None:
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
@@ -280,7 +279,7 @@ def editItem(category_name, item_name):
 
     # Get the Category and Item to be edited.
     category = session.query(Category).filter_by(name=category_name).first()
-    if category is None:        
+    if category is None:
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
@@ -328,7 +327,7 @@ def deleteItem(category_name, item_name):
         return redirect('/login')
 
     category = session.query(Category).filter_by(name=category_name).first()
-    if category is None:        
+    if category is None:
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
