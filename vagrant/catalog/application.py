@@ -132,6 +132,7 @@ def editCategory(category_name):
 # Delete Category
 @app.route('/catalog/<category_name>/delete', methods=['GET', 'POST'])
 def deleteCategory(category_name):
+	print 'inside deleteCategory'
 	# Get the category from the database by the category name.
 	category = session.query(Category).filter_by(name = category_name).one()
 
@@ -156,7 +157,7 @@ def deleteCategory(category_name):
 		# Now, delete the category.
 		session.delete(category)
 		session.commit()
-		flash("Category Successfully Deleted")
+		flash("%s Category Successfully Deleted" % category_name)
 		return redirect(url_for('index'))
 	else:
 		return render_template('deleteCategory.html', category=category)
@@ -479,7 +480,7 @@ def addToUserCollection(category_name, item_name):
 		flash("%s is already in your collection." % item.name, 'error')
 		return redirect(url_for('showCategory', category_name=category_name))
 
-@app.route('/catalog/myItems')
+@app.route('/catalog/myCollection')
 def userCollection():
 	# Check that a user is logged in.
 	if 'username' not in login_session:
@@ -489,9 +490,7 @@ def userCollection():
 	user_id = login_session['user_id']		
 	
 	# Query the database with a join to get the user's items.
-	items = session.query(Item).join(UserItem).filter(UserItem.item_id == Item.id).all()
-	for i in items:
-		print i
+	items = session.query(Item).join(UserItem).filter(UserItem.item_id == Item.id).all()	
 	
 	return render_template('userItems.html', items=items)
 

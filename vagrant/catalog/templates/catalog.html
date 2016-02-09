@@ -11,7 +11,7 @@
 			<a href='{{ (url_for('showCategory', category_name=c.name)) }}' class='list-group-item'>{{c.name}}</a>
 			{% endfor %}
 		</ul>		
-		<a href='{{ (url_for('newCategory')) }}' class='btn btn-primary'>Add New</a>		
+		<a href='{{ (url_for('newCategory')) }}' class='btn btn-primary'>Add New Category</a>		
 		{% endif %}
 	</div>
 </div>
@@ -28,7 +28,11 @@
 						<div class="caption">
 							<h3>{{ item.name}} </h3>
 							<h4>{{ item.category.name }}<h4>
-							<p><a href='{{ (url_for('viewItem', category_name=item.category.name, item_name=item.name)) }}' class="btn btn-primary" role="button">View</a></p>
+							<p>
+							<a href='{{ (url_for('viewItem', category_name=item.category.name, item_name=item.name)) }}' class="btn btn-primary" role="button">View Details</a>
+							<a href='{{ (url_for('addToUserCollection', category_name=item.category.name, item_name=item.name)) }}' class="btn btn-success" role="button">I Have This!</a>
+							</p>
+
 						</div>
 					</div>											
 				</div>

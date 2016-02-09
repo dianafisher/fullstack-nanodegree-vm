@@ -59,6 +59,7 @@ footer {
 .img-user {
 	margin: 2px;
 	margin-right: 15px;
+	margin-left: 10px;
 }
 
 .creator {
@@ -80,4 +81,9 @@ footer {
 	color: #7B7573;
 	font-weight: 700;
 	margin-top: -20px;
+}
+
+li#logged-in-user {
+	color: #FFFFFF;
+	padding-top: 15px;
 }
