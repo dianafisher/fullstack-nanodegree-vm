@@ -1,71 +1,71 @@
 {% extends "index.html" %}
 {% block content %}
-<div class="bs-docs-section">
-	<div class="row">
-		<div class="col-lg-12">
-			<!-- <div class="page-header"> -->
-				<h1>Please Sign In</h1>					
-			<!-- </div> -->
-		</div>
-	</div>
-</div>
-<div class="row">
-	<div class="col-lg-12">		
-			<!-- Make div to hold the Google sign-in button -->
-			<div id="signinButton">
+    <div class="bs-docs-section">
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- <div class="page-header"> -->
+                <h1>Please Sign In</h1>
+                <!-- </div> -->
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <!-- Make div to hold the Google sign-in button -->
+            <div id="signinButton">
 				<span class="g-signin"
-				  data-scope="openid email"
-				  data-clientid="504773760924-u752enuph4ic1c4kcj6js64r17b56sl7.apps.googleusercontent.com"
-				  data-redirecturi="postmessage"
-				  data-accesstype="offline"
-				  data-cookiepolicy="single_host_origin"
-				  data-callback="signInCallback"
-				  data-approvalprompt="force">
+                      data-scope="openid email"
+                      data-clientid="504773760924-u752enuph4ic1c4kcj6js64r17b56sl7.apps.googleusercontent.com"
+                      data-redirecturi="postmessage"
+                      data-accesstype="offline"
+                      data-cookiepolicy="single_host_origin"
+                      data-callback="signInCallback"
+                      data-approvalprompt="force">
 				</span>
-			</div>			
-	</div>
-</div>
-<div class="row">
-	<div class="col-lg-12">
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<div id="result"></div>
-			</div>
-		</div>
-	</div>
-</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div id="result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- Google sign-in -->
-<script type="text/javascript">
-	function signInCallback(authResult){
-		if (authResult['code']) {
-			// Hide the sign-in button now that the user is authorized.
-			$('#signinButton').attr('style', 'display: none');
-			// Send the one-time code to the server, if the server 
-			// responds, write a 'login successful' message to the web page
-			// and then redirect back to the main page
-			$.ajax({
-				type: 'POST',
-				url: '/gconnect?state={{STATE}}',
-				processData: false,
-				contentType: 'application/octet-stream; charset=utf-8',
-				data: authResult['code'],
-				success: function(result) {
-					if (result) {
-						$('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
-						setTimeout(function(){
-							window.location.href = "/catalog";
-						}, 4000);
-					} else if (authResult['error']) {
-						console.error('There was an error: ' + authResult['error']);
-					} else {
-						// No response..
-						$('#result').html('Failed to make a server side call.  Check your configuration and console.');
-					}
-				}
-			});
-		}
-	} 
-</script>
+    <!-- Google sign-in -->
+    <script type="text/javascript">
+        function signInCallback(authResult) {
+            if (authResult['code']) {
+                // Hide the sign-in button now that the user is authorized.
+                $('#signinButton').attr('style', 'display: none');
+                // Send the one-time code to the server, if the server
+                // responds, write a 'login successful' message to the web page
+                // and then redirect back to the main page
+                $.ajax({
+                    type: 'POST',
+                    url: '/gconnect?state={{STATE}}',
+                    processData: false,
+                    contentType: 'application/octet-stream; charset=utf-8',
+                    data: authResult['code'],
+                    success: function (result) {
+                        if (result) {
+                            $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
+                            setTimeout(function () {
+                                window.location.href = "/catalog";
+                            }, 4000);
+                        } else if (authResult['error']) {
+                            console.error('There was an error: ' + authResult['error']);
+                        } else {
+                            // No response..
+                            $('#result').html('Failed to make a server side call.  Check your configuration and console.');
+                        }
+                    }
+                });
+            }
+        }
+    </script>
 
 {% endblock %}

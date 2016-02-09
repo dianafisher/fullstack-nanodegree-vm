@@ -1,19 +1,19 @@
 * {
-	font-family: "Helvetica Neue Bold", Roboto, Helvetica, Arial, sans-serif;
-	
+    font-family: "Helvetica Neue Bold", Roboto, Helvetica, Arial, sans-serif;
+
 }
 
 body {
-  	padding-top: 70px;
-  	padding-bottom: 20px;
+    padding-top: 70px;
+    padding-bottom: 20px;
 }
 
 .page-header {
-	margin: 10px 0 21px;
+    margin: 10px 0 21px;
 }
 
 .navbar {
-  	margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 footer {
@@ -21,69 +21,77 @@ footer {
 }
 
 .form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: 0 auto;
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
 }
+
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
- 	margin-bottom: 10px;
-}
-.form-signin .checkbox {
-	font-weight: normal;
-}
-.form-signin .form-control {
-	position: relative;
-	height: auto;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-	padding: 10px;
-	font-size: 16px;
-}
-.form-signin .form-control:focus {
- 	z-index: 2;
-}
-.form-signin input[type="email"] {
- 	margin-bottom: -1px;
-	border-bottom-right-radius: 0;
-	border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-	margin-bottom: 10px;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
+    margin-bottom: 10px;
 }
 
+.form-signin .checkbox {
+    font-weight: normal;
+}
+
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+
+.form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
 
 .img-user {
-	margin: 2px;
-	margin-right: 15px;
-	margin-left: 10px;
+    margin: 2px;
+    margin-right: 15px;
+    margin-left: 10px;
 }
 
 .creator {
-	padding-right: 20px;
-	margin-top: -20px;
-	text-align: right;
-	float:right;
+    padding-right: 20px;
+    margin-top: -20px;
+    text-align: right;
+    float: right;
 }
+
 .creator img {
-	width: 100px;
-	border-radius: 50%;
+    width: 100px;
+    border-radius: 50%;
 }
+
 .creator object {
-	width: 100px;
-	border-radius: 50%;
+    width: 100px;
+    border-radius: 50%;
 }
+
 .creator figcaption {
-	font-size: 14px;
-	color: #7B7573;
-	font-weight: 700;
-	margin-top: -20px;
+    font-size: 14px;
+    color: #7B7573;
+    font-weight: 700;
+    margin-top: -20px;
 }
 
 li#logged-in-user {
-	color: #FFFFFF;
-	padding-top: 15px;
+    color: #FFFFFF;
+    padding-top: 15px;
 }

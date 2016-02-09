@@ -1,5 +1,6 @@
 from jinja2 import Markup
 
+
 # Class to wrap the moment.js calls
 class Momentjs(object):
     def __init__(self, timestamp):
