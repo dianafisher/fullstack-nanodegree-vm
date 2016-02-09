@@ -6,24 +6,25 @@
         <div class="col-lg-12">
             <h2>Categories</h2>
             <ul class="list-group">
-                {% if categories %}
+                {% if categories[0] %}
                     {% for c in categories %}
                         <a href='{{ (url_for('showCategory', category_name=c.name)) }}'
                            class='list-group-item'>{{ c.name }}</a>
                     {% endfor %}
-                    </ul>
-                    <a href='{{ (url_for('newCategory')) }}'
+                    </ul>                    
+                {% else %}        
+            <h3><small>No categories have been added yet.</small></h3>               
+            {% endif %}
+            <a href='{{ (url_for('newCategory')) }}'
                        class='btn btn-primary'>Add New Category</a>
-                {% endif %}
         </div>
     </div>
     <div class="row">
         <div class="col-lg-12">
             <div id="latest-items">
                 <h2>Recently Added Items</h2>
-
-                <div class="row">
-                    {% if items %}
+                
+                    {% if items[0] %}
                         {% for item in items %}
                             <div class="col-lg-6">
                                 <div class="thumbnail">
@@ -50,9 +51,15 @@
                                 </div>
                             </div>
 
-                        {% endfor %}
-                    {% endif %}
+                        {% endfor %}                        
+                
+                {% else %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h3><small>No items have been added.  Create and/or select a category to add some items to it!</small></h3>
+                    </div>
                 </div>
+                    {% endif %}
             </div>
         </div>
     </div>

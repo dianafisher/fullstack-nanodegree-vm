@@ -6,23 +6,23 @@
     <div class="row">
         <div class="col-lg-12">
             <h2>Categories</h2>
-            <ul class="list-group">
-                {% if categories %}
-                    {% for c in categories %}
-                        <a href='{{ (url_for('showCategory', category_name=c.name)) }}'
-                           class='list-group-item'>{{ c.name }}</a>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
+            {% if categories[0] %}
+                <ul class="list-group">                
+                {% for c in categories %}
+                    <a href='{{ (url_for('showCategory', category_name=c.name)) }}'
+                       class='list-group-item'>{{ c.name }}</a>
+                {% endfor %}
+                </ul>
+            {% else %}        
+            <h3><small>No categories have been added yet.  Sign in and create one!</small></h3>             
         </div>
+    {% endif %}    
     </div>
     <div class="row">
         <div class="col-lg-12">
             <div id="latest-items">
-                <h2>Recently Added Items</h2>
-
-                <div class="row">
-                    {% if items %}
+                <h2>Recently Added Items</h2>                
+                    {% if items[0] %}
                         {% for item in items %}
                             <div class="col-lg-6">
                                 <div class="thumbnail">
@@ -32,21 +32,27 @@
 
                                     <div class="caption">
                                         <h3>{{ item.name }} </h3>
-                                        <h4>{{ item.category.name }}
-                                            <h4>
+                                        <h4>{{ item.category.name }}                                            
                                                 <p>
                                                     <a href='{{ (url_for('viewItem', category_name=item.category.name, item_name=item.name)) }}'
                                                        class="btn btn-primary"
                                                        role="button">View</a>
                                                 </p>
+                                        </h4>
                                     </div>
                                 </div>
                             </div>
 
-                        {% endfor %}
-                    {% endif %}
+                        {% endfor %}                                    
+                
+                {% else %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h3><small>No items have been added.  Create a category to add some items to it!</small></h3>
+                    </div>
                 </div>
-            </div>
+                    {% endif %}                
+            </div>            
         </div>
     </div>
 {% endblock %}
