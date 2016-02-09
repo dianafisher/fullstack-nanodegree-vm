@@ -8,13 +8,21 @@ A "My Collection" section is available for users to indicate they own (physical 
 
 OAuth2 user authentication is supported via Google sign in.
 
+### Features
+- CRUD of categories and items in database
+- JSON and Atom feed endpoints
+- Image upload for items
+- cross-site request forgery prevention
+- Google sign-in for user authentication
+
+
 ### Requirements
 
 - Vagrant VM (https://www.vagrantup.com/downloads)
 - VirtualBox (https://www.virtualbox.org/wiki/Downloads)
 - Python 2.7 or higher
 - [SQLAlchemy](http://www.sqlalchemy.org/download.html)
-- Flask-SeaSurf (https://flask-seasurf.readthedocs.org/en/latest/)
+- Flask-SeaSurf (https://flask-seasurf.readthedocs.org/en/latest/) for CSRF prevention
 
 ### Installation
 1. Clone the GitHub repository.  This repository contains a shell script pg_config.sh which automates the installation and configuration of the Vagrant VM.  This includes installation of the psycopg2 PostGreSQL adapter.
