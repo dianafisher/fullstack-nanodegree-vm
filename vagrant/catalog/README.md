@@ -17,34 +17,46 @@ OAuth2 user authentication is supported via Google sign in.
 
 	$ git clone https://github.com/dianafisher/fullstack-nanodegree-vm.git
 
-2. Change directories to enter the vagrant directory
-
-	$ cd /vagrant
-
-3. Launch the Vagrant virtual machine.	
+2. Change directories to enter the vagrant directory and launch the Vagrant virtual machine
 	
 	```sh
+	$ cd vagrant
 	$ vagrant up
 	```
 
 4. Log into the Vagrant virtual machine.
 
+	```sh
 	$ vagrant ssh
+	```
 
 5. Change directories to enter the catalog directory.
 
+	```sh
 	$ cd \vagrant\catalog
+	```
 
 6. Create the catalog database from the database_setup.py file provided.
 	
+	```sh
 	$ python database_setup.py
+	```
 
-7. Optionally, pre-populate the catalog databse by executing the database_populator.py script provided
+7. Optionally, pre-populate the catalog databse by executing the database_populator.py script provided.
 
-	$ database_populator.py
+	```sh
+	$ python database_populator.py
+	```
 
-8. To support user authentication, register the app at [Google](https://console.developers.google.com/project).  Download the client_secrets.json and replace the one provided.
+### Running
 
+Launch the app by executing application.py with the Python interpreter.
+
+	```sh
+	$ python application.py
+	```
+
+Open a web browser and go to http://localhost:8000 
 
 
  
