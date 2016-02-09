@@ -19,8 +19,10 @@ OAuth2 user authentication is supported via Google.
 
 2. Launch the Vagrant virtual machine.
 
+'''sh
 	$ cd vagrant
 	$ vagrant up
+'''
 
 3. Log into the Vagrant virtual machine.
 
