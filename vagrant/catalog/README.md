@@ -55,10 +55,8 @@ OAuth2 user authentication is supported via Google sign in.
 ### Running
 
 Launch the app by executing application.py with the Python interpreter.
-
-	```sh
-	$ python application.py
-	```
+	
+	$ python application.py	
 
 Open a web browser and go to http://localhost:8000 
 
