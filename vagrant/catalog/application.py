@@ -131,11 +131,20 @@ def showCategory(category_name):
 def newCategory():
     
     if request.method == 'POST':
-        category = Category(user_id=login_session['user_id'],
-                            name=request.form['name'])
-        session.add(category)
-        flash("New Category Created")
-        return redirect(url_for('index'))
+        # Check to make sure a category with this name 
+        # does not already exist        
+        category_name = request.form['name']
+        category = session.query(Category).filter_by(name=category_name).first()
+
+        if category is None:
+            category = Category(user_id=login_session['user_id'],
+                            name=category_name)
+            session.add(category)
+            flash("New Category Created")
+            return redirect(url_for('index'))
+        else:
+            flash('Category %s already exists.' % category_name, 'error')
+            return redirect(url_for('newCategory'))
     else:
         return render_template('newCategory.html')
 
