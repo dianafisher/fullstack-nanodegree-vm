@@ -111,6 +111,10 @@ def index():
         return render_template('catalog.html', categories=categories,
                                items=items)
 
+def category_exists(item_name):
+    category = session.query(Category).filter_by(name=category_name).first()
+    return category is not None
+
 
 # Show items in a category (by category name)
 @app.route('/catalog/<category_name>')
@@ -133,17 +137,18 @@ def newCategory():
     if request.method == 'POST':
         # Check to make sure a category with this name 
         # does not already exist        
-        category_name = request.form['name']
-        category = session.query(Category).filter_by(name=category_name).first()
+        entered_name = request.form['name']
+        category = session.query(Category).filter_by(name=entered_name).first()
 
         if category is None:
             category = Category(user_id=login_session['user_id'],
-                            name=category_name)
+                            name=entered_name)
             session.add(category)
+            session.commit()
             flash("New Category Created")
             return redirect(url_for('index'))
         else:
-            flash('Category %s already exists.' % category_name, 'error')
+            flash('Category %s already exists.' % entered_name, 'error')
             return redirect(url_for('newCategory'))
     else:
         return render_template('newCategory.html')
@@ -166,16 +171,21 @@ def editCategory(category_name):
         # Refresh the page.
         return redirect(url_for('showCategory', category_name=category_name))
 
-    if request.method == 'POST':
-        # Check which button was pressed, Cancel or Submit
-
+    if request.method == 'POST':        
+        
         if request.form['name']:
-            category.name = request.form['name']
-            session.add(category)
-            session.commit()
-            flash("Changes saved for category %s." % category.name)
-            return redirect(
-                url_for('showCategory', category_name=category.name))
+            # Check if the entered category name already exists in the database.
+            entered_name = request.form['name']                        
+            c = session.query(Category).filter_by(name=entered_name).first()
+            if c is not None:
+                flash('Category %s already exists.' % entered_name, 'error')
+                return render_template('editCategory.html', category=category)
+            else:
+                category.name = request.form['name']
+                session.add(category)
+                session.commit()
+                flash("Changes saved for category %s." % category.name)
+                return redirect(url_for('showCategory', category_name=category.name))
     else:
         return render_template('editCategory.html', category=category)
 
@@ -236,6 +246,13 @@ def newItem(category_name):
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+        item_name = request.form['name']              
+        item = session.query(Item).filter_by(name=item_name).first()    
+        if item is not None:
+            flash('%s already exists.  Please use a different name.' % item_name, 'error')
+            # render_template('newItem.html')
+            return redirect(url_for('newItem', category_name=category_name))
 
         # Create a new Item object.
         created_item = Item(user_id=login_session['user_id'],
@@ -269,11 +286,19 @@ def viewItem(category_name, item_name):
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
+    item = session.query(Item).filter_by(name=item_name).first()    
+    if item is None:
+        flash('Item %s not found.' % item_name, 'error')
+        return redirect(url_for('index'))
+
     item = session.query(Item).filter_by(category_id=category.id,
                                          name=item_name).one()
 
     updated = momentjs.Momentjs(item.lastUpdated).fromNow()
-    user = session.query(User).filter_by(id=item.user_id).one()
+    user = session.query(User).filter_by(id=item.user_id).first()
+    if user is None:
+        flash('Item creator not found', 'error')
+        return redirect(url_for('index')) 
 
     return render_template('item.html', item=item, updated=updated, user=user)
 
@@ -290,8 +315,16 @@ def editItem(category_name, item_name):
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
+    # Get the item to edit.
     editedItem = session.query(Item).filter_by(category_id=category.id,
-                                               name=item_name).one()
+                                               name=item_name).first()
+
+    print editedItem
+    # If the item is not found, display an error and refresh
+    if editedItem is None:
+        print 'cannot find item %s' % item_name
+        flash('Item %s not found.' % item_name, 'error')
+        return redirect(url_for('index'))
 
     # Check that the logged in user has authorization to edit this item.
     if editedItem.user_id != login_session['user_id']:
@@ -305,7 +338,13 @@ def editItem(category_name, item_name):
     # Handle the POST request
     if request.method == 'POST':
         if request.form['name']:
-            editedItem.name = request.form['name']
+            entered_name = request.form['name']
+            item = session.query(Item).filter_by(name=entered_name).first()    
+            if item is not None:
+                flash('Item with name %s already exists.' % entered_name, 'error')
+                return render_template('editItem.html', item=editedItem)
+            else:
+                editedItem.name = entered_name
 
         if request.form['description']:
             editedItem.description = request.form['description']
@@ -338,7 +377,12 @@ def deleteItem(category_name, item_name):
         return redirect(url_for('index'))
 
     itemToDelete = session.query(Item).filter_by(category_id=category.id,
-                                                 name=item_name).one()
+                                                 name=item_name).first()
+
+    # If the item is not found, display an error and refresh
+    if itemToDelete is None:
+        flash('Item %s not found.' % item_name, 'error')
+        return redirect(url_for('index'))
 
     # Check that the logged in user has authorization to edit this item.
     if itemToDelete.user_id != login_session['user_id']:

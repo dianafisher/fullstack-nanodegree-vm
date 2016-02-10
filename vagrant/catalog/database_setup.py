@@ -35,7 +35,7 @@ class Item(Base):
     __tablename__ = 'item'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=False, unique=True)
     dateAdded = Column(DateTime)
     lastUpdated = Column(DateTime)
     description = Column(String(1000))
