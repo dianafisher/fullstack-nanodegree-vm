@@ -35,6 +35,9 @@ from flask import send_from_directory
 # imports for preventing cross-site request forgery
 from flask.ext.seasurf import SeaSurf
 
+# import for decorators
+from functools import wraps
+
 # Load client id from json file obtained from Google
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web'][
     'client_id']
@@ -58,6 +61,17 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+'''Decorator for login check'''
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' in login_session:
+            return f(*args, **kwargs)
+        else:            
+            return redirect(url_for('showLogin', next=request.url))
+    return decorated_function
 
 def make_external(url):
     return urljoin(request.url_root, url)
@@ -113,9 +127,9 @@ def showCategory(category_name):
 
 # Create new category
 @app.route('/catalog/category/new', methods=['GET', 'POST'])
+@login_required
 def newCategory():
-    if 'username' not in login_session:
-        return redirect('/login')
+    
     if request.method == 'POST':
         category = Category(user_id=login_session['user_id'],
                             name=request.form['name'])
@@ -128,16 +142,13 @@ def newCategory():
 
 # Edit Category
 @app.route('/catalog/<category_name>/edit', methods=['GET', 'POST'])
+@login_required
 def editCategory(category_name):
     # Get the category from the database by the category name.
     category = session.query(Category).filter_by(name=category_name).first()
     if category is None:
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
-
-    # Check that a user is logged in.
-    if 'username' not in login_session:
-        return redirect('/login')
 
     # Check that the logged in user has authorization to edit this category.
     if category.user_id != login_session['user_id']:
@@ -162,6 +173,7 @@ def editCategory(category_name):
 
 # Delete Category
 @app.route('/catalog/<category_name>/delete', methods=['GET', 'POST'])
+@login_required
 def deleteCategory(category_name):
     print 'inside deleteCategory'
     # Get the category from the database by the category name.
@@ -171,12 +183,8 @@ def deleteCategory(category_name):
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
 
-    # Check that a user is logged in.
-    if 'username' not in login_session:
-        return redirect('/login')
 
-        # Check that the logged in user has authorization to delete this
-        # category.
+    # Check that the logged in user has authorization to delete category    
     if category.user_id != login_session['user_id']:
         # Inform the user.
         flash('You are not authorized to delete this category.', 'error')
@@ -204,6 +212,7 @@ def deleteCategory(category_name):
 
 # Create new item
 @app.route('/catalog/<category_name>/items/new', methods=['GET', 'POST'])
+@login_required
 def newItem(category_name):
     """Creates a new item in the databse for the specified category.
     A user must be logged in to add an item to a category,
@@ -215,10 +224,6 @@ def newItem(category_name):
     if category is None:
         flash('Category %s not found.' % category_name, 'error')
         return redirect(url_for('index'))
-
-    # Check that a user is logged in.
-    if 'username' not in login_session:
-        return redirect('/login')
 
     if request.method == 'POST':
         # Create the new item
@@ -273,9 +278,8 @@ def viewItem(category_name, item_name):
 # Update/Edit item
 @app.route('/catalog/<category_name>/<item_name>/edit',
            methods=['GET', 'POST'])
+@login_required
 def editItem(category_name, item_name):
-    if 'username' not in login_session:
-        return redirect('/login')
 
     # Get the Category and Item to be edited.
     category = session.query(Category).filter_by(name=category_name).first()
@@ -322,10 +326,9 @@ def editItem(category_name, item_name):
 # Delete item
 @app.route('/catalog/<category_name>/<item_name>/delete',
            methods=['GET', 'POST'])
+@login_required
 def deleteItem(category_name, item_name):
-    if 'username' not in login_session:
-        return redirect('/login')
-
+    
     category = session.query(Category).filter_by(name=category_name).first()
     if category is None:
         flash('Category %s not found.' % category_name, 'error')
@@ -563,10 +566,8 @@ def addToUserCollection(category_name, item_name):
 
 
 @app.route('/catalog/myCollection')
+@login_required
 def userCollection():
-    # Check that a user is logged in.
-    if 'username' not in login_session:
-        return redirect('/login')
 
     # Get the id of the current logged in user.
     user_id = login_session['user_id']
