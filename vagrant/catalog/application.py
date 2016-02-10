@@ -175,7 +175,7 @@ def editCategory(category_name):
 @app.route('/catalog/<category_name>/delete', methods=['GET', 'POST'])
 @login_required
 def deleteCategory(category_name):
-    print 'inside deleteCategory'
+    
     # Get the category from the database by the category name.
     category = session.query(Category).filter_by(name=category_name).first()
 
@@ -191,14 +191,8 @@ def deleteCategory(category_name):
         # Refresh the page.
         return redirect(url_for('showCategory', category_name=category_name))
 
-    if request.method == 'POST':
-        # First, delete all of the items in the category.
-        items = session.query(Item).filter_by(category_id=category.id)
-        for item in items:
-            session.delete(item)
-            session.commit()
-
-        # Now, delete the category.
+    if request.method == 'POST':        
+        # Delete the category.
         session.delete(category)
         session.commit()
         flash("%s Category Successfully Deleted" % category_name)

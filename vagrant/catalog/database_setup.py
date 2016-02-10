@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref
 from sqlalchemy import create_engine
 
 Base = declarative_base()
@@ -45,9 +46,10 @@ class Item(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
-    # Create a foreign key reference to the Category in which this item resides
-    category_id = Column(Integer, ForeignKey('category.id'))
-    category = relationship(Category)
+    # Create a foreign key reference to the Category in which this item resides.
+    category_id = Column(Integer, ForeignKey('category.id'), nullable=False)    
+    # Propogate the deletion of the category in which this item resides to also delete this item.
+    category = relationship(Category, backref=backref('Category', cascade="all, delete-orphan"), single_parent=True)
 
     @property
     def serialize(self):
