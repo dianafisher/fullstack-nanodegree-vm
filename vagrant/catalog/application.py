@@ -53,6 +53,8 @@ csrf = SeaSurf(app)
 UPLOAD_FOLDER = './uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# Limit image file size to 16 MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  
 
 # Connect to the database and create database session
 engine = create_engine('sqlite:///minifigures.db')
@@ -318,8 +320,7 @@ def editItem(category_name, item_name):
     # Get the item to edit.
     editedItem = session.query(Item).filter_by(category_id=category.id,
                                                name=item_name).first()
-
-    print editedItem
+    
     # If the item is not found, display an error and refresh
     if editedItem is None:
         print 'cannot find item %s' % item_name
@@ -339,12 +340,16 @@ def editItem(category_name, item_name):
     if request.method == 'POST':
         if request.form['name']:
             entered_name = request.form['name']
-            item = session.query(Item).filter_by(name=entered_name).first()    
-            if item is not None:
-                flash('Item with name %s already exists.' % entered_name, 'error')
-                return render_template('editItem.html', item=editedItem)
-            else:
-                editedItem.name = entered_name
+            print 'entered name', entered_name
+            print 'item name', editedItem.name
+            # If the user enters a new name, check that it does not already exist.
+            if entered_name != item_name:
+                item = session.query(Item).filter_by(name=entered_name).first()    
+                if item is not None:                
+                    flash('Item with name %s already exists.' % entered_name, 'error')
+                    return render_template('editItem.html', item=editedItem)
+                else:
+                    editedItem.name = entered_name
 
         if request.form['description']:
             editedItem.description = request.form['description']
@@ -352,8 +357,14 @@ def editItem(category_name, item_name):
         file = request.files['file']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            editedItem.imageFilename = filename
+
+            # Check that this is a new file.  Delete the old file if it is.
+            if filename is not editedItem.imageFilename:
+                # Delete the old image file
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], editedItem.imageFilename))
+
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                editedItem.imageFilename = filename
 
         editedItem.lastUpdated = datetime.utcnow()
         session.add(editedItem)
@@ -394,6 +405,10 @@ def deleteItem(category_name, item_name):
                                 item_name=itemToDelete.name))
 
     if request.method == 'POST':
+        # Delete the item image from the database
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], itemToDelete.imageFilename))
+
+        # Delete the item from the database
         session.delete(itemToDelete)
         session.commit()
         flash("Item deleted!")
